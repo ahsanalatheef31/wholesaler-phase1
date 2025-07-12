@@ -1,0 +1,86 @@
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 60px;
+  width: 100%;
+  background-color: #0b0434;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  
+}
+.logout {
+   background: none;
+   border: none;
+   color: #fff;
+   cursor: pointer;
+   font-size: 14px;
+   padding: 5px 10px;
+   border-radius: 4px;
+   background-color: rgba(255, 255, 255, 0.1);
+   margin-right: 120px;
+}
+
+.header {
+  font-size: 22px;
+  font-weight: bold;
+  color: #ffffff; 
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+.profile-picture {
+  position: absolute;
+  right: 90px;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.profile-picture img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #f0c040;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.profile-picture img:hover {
+  transform: scale(1.05);
+}
+
+
+
+.links {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 60px;
+}
+
+
+.links a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.links a:hover {
+  color: #6c6961;
+ 
+}
+
+body {
+  font-family: 'Times New Roman', Times, serif;
+  
+}
