@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import '../../Styles/Login.css';
 import axios from 'axios';
+import PopupDialog from './PopupDialog';
 import { useAuth } from '../../Context/AuthContext';
 
 function Login() {
   const [formData, setFormData] = useState({ username: '', password: '' });
-  const [error, setError] = useState('');
+  const [popup, setPopup] = useState({ open: false, type: 'success', title: '', message: '' });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -16,15 +17,16 @@ function Login() {
   const handleSubmit = async e => {
     e.preventDefault();
     setLoading(true);
-    setError('');
-    
     try {
       const res = await axios.post('http://localhost:8000/api/accounts/login/', formData);
-      login(res.data.access, res.data.user);
-      alert('Login successful!');
-      navigate('/dashboard');
+      setPopup({ open: true, type: 'success', title: 'Login Successful', message: 'You have logged in successfully.' });
+      setTimeout(() => {
+        login(res.data.access); // update context after popup
+        setPopup({ ...popup, open: false });
+        navigate('/dashboard');
+      }, 1200);
     } catch (err) {
-      setError('Invalid username or password');
+      setPopup({ open: true, type: 'error', title: 'Login Failed', message: 'Invalid username or password.' });
     } finally {
       setLoading(false);
     }
@@ -32,6 +34,7 @@ function Login() {
 
   return (
     <div className="main-background">
+      <PopupDialog {...popup} onClose={() => setPopup({ ...popup, open: false })} />
       <div className="main-box">
         <div className="form-box">
           <h2>Welcome Back</h2>
@@ -45,25 +48,19 @@ function Login() {
             <span>Log in with Google</span>
           </button>
           <div className="divider"><span>OR LOGIN WITH EMAIL</span></div>
-          {error && <p className="error-message">{error}</p>}
           <form onSubmit={handleSubmit}>
             <input name="username" placeholder="Your Username" onChange={handleChange} required />
-
             <input name="password" type="password" placeholder="Your Password" onChange={handleChange} required />
             <div className="options">
               <label><input type="checkbox" /> Keep me logged in</label>
               <a href="#">Forgot password?</a>
             </div>
-            <button type="submit" className="login-btn" disabled={loading}>
-              {loading ? 'Logging in...' : 'Log In'}
-            </button>
+            <button type="submit" className="login-btn" disabled={loading}>{loading ? 'Logging in...' : 'Log In'}</button>
           </form>
-          <p className="signup-link">Don't have an account? <a href="/signup">Sign up</a></p>
+          <p className="signup-link">Don't have an account? <Link to="/signup">Sign up</Link></p>
         </div>
         <div className="image-box">
           <img src="/ima.png" alt="My Photo" width="400" />
-
-          
         </div>
       </div>
     </div>

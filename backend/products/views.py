@@ -118,3 +118,16 @@ def add_product(request):
         print(f"❌ Error in add_product: {str(e)}")
         return Response({'error': str(e)}, status=500)
         return Response({'error': str(e)}, status=500)
+
+@api_view(['POST'])
+def update_status(request, product_id):
+    try:
+        product = Product.objects.get(id=product_id)
+        status = request.data.get('status')
+        if status not in dict(Product.STATUS_CHOICES):
+            return Response({'error': 'Invalid status'}, status=400)
+        product.status = status
+        product.save()
+        return Response({'status': 'success', 'new_status': product.status})
+    except Product.DoesNotExist:
+        return Response({'error': 'Product not found'}, status=404)

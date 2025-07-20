@@ -84,7 +84,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'wholesaler',         # Replace with your MySQL DB name
         'USER': 'root',      # e.g., 'root'
-        'PASSWORD': 'Root@123',  # e.g., 'password'
+        'PASSWORD': 'dbms123',  # e.g., 'password'
         'HOST': 'localhost',
         'PORT': '3306',
     }
