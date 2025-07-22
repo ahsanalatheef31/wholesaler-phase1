@@ -26,16 +26,13 @@ function AppWrapper() {
 
   return (
     <>
-<<<<<<< HEAD
       {!shouldHideNavbar && (
         <>
-          <NavBar />
+          <Navbar />
           <Header />
         </>
       )}
-=======
       {!shouldHideNavbar && <Navbar />}
->>>>>>> dcae7d5c4401c771acaa0939f667aebb40e6acfa
 
       <Routes>
         {/* Public routes */}

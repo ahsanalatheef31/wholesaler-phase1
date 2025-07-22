@@ -2,12 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../../Styles/Inventory.css';
 
-<<<<<<< HEAD
-const columns = ["Product", "Model ID", "Size", "Stock", "Price", "Supplier", "Actions"];
-=======
-const columns = ["Product", "Model ID", "Size", "Stock", "Price", "Actions", "Status"];
+const columns = ["Product", "Model ID", "Size", "Stock", "Price", "Supplier", "Actions", "status"];
 const statusOptions = ["Pending", "Defective", "Returned"];
->>>>>>> dcae7d5c4401c771acaa0939f667aebb40e6acfa
 
 export default function InventoryTable() {
   const [products, setProducts] = useState([]);
@@ -79,48 +75,10 @@ export default function InventoryTable() {
       <tbody>
         {products.length === 0 ? (
           <tr>
-            <td colSpan={7} style={{ textAlign: 'center', padding: '20px' }}>
+            <td colSpan={columns.length} style={{ textAlign: 'center', padding: '20px' }}>
               No products found. Add some products to get started!
             </td>
           </tr>
-<<<<<<< HEAD
-        </thead>
-        <tbody>
-          {products.length === 0 ? (
-            <tr>
-              <td colSpan={7} style={{ textAlign: 'center', padding: '20px' }}>
-                No products found. Add some products to get started!
-              </td>
-            </tr>
-          ) : (
-            products.map((item) => (
-              <tr key={item.id}>
-                <td>
-                  <div className="product-info">
-                    <div className="product-img-placeholder">40×40</div>
-                    <div>
-                      <div className="product-name">{item.name}</div>
-                      <div className="product-variant">ID: {item.id}</div>
-                    </div>
-                  </div>
-                </td>
-                <td>{item.model_no}</td>
-                <td>{item.size}</td>
-                <td>{item.pieces}</td>
-                <td>₹{parseFloat(item.price).toFixed(2)}</td>
-                <td>{item.supplier_name ? item.supplier_name : 'N/A'}</td>
-                <td>
-                  <span className="edit-link">Edit</span> 
-                  <span className="delete-link" onClick={() => handleDelete(item.id)}>Delete</span>
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-        
-    )
-=======
         ) : (
           products.map((item) => (
             <tr key={item.id}>
@@ -137,6 +95,7 @@ export default function InventoryTable() {
               <td>{item.size}</td>
               <td>{item.pieces}</td>
               <td>₹{parseFloat(item.price).toFixed(2)}</td>
+              <td>{item.supplier_name ? item.supplier_name : 'N/A'}</td>
               <td>
                 <span className="edit-link">Edit</span>
                 <span className="delete-link" onClick={() => handleDelete(item.id)}>Delete</span>
@@ -148,25 +107,43 @@ export default function InventoryTable() {
                     className={`status-icon-btn-standard${item.status === 'Received' ? ' active' : ''}`}
                     onClick={() => updateStatus(item.id, 'Received')}
                   >
-                    <img src="/checkmark.png" alt="tick" width={20} height={20} style={{ filter: item.status === 'Received' ? 'none' : 'grayscale(1) brightness(1.7)', opacity: item.status === 'Received' ? 1 : 0.7 }} />
+                    <img
+                      src="/checkmark.png"
+                      alt="tick"
+                      width={20}
+                      height={20}
+                      style={{
+                        filter: item.status === 'Received' ? 'none' : 'grayscale(1) brightness(1.7)',
+                        opacity: item.status === 'Received' ? 1 : 0.7
+                      }}
+                    />
                   </button>
                   <button
                     title="Change Status"
-                    className={`status-icon-btn-standard${['Defective','Returned'].includes(item.status) ? ' active-x' : ''}`}
+                    className={`status-icon-btn-standard${['Defective', 'Returned'].includes(item.status) ? ' active-x' : ''}`}
                     onClick={() => handleDropdown(item.id, !dropdownOpen[item.id])}
                   >
-                    <img src="/cross.png" alt="cross" width={20} height={20} style={{ filter: ['Defective','Returned'].includes(item.status) ? 'none' : 'grayscale(1) brightness(1.7)', opacity: ['Defective','Returned'].includes(item.status) ? 1 : 0.7 }} />
+                    <img
+                      src="/cross.png"
+                      alt="cross"
+                      width={20}
+                      height={20}
+                      style={{
+                        filter: ['Defective', 'Returned'].includes(item.status) ? 'none' : 'grayscale(1) brightness(1.7)',
+                        opacity: ['Defective', 'Returned'].includes(item.status) ? 1 : 0.7
+                      }}
+                    />
                   </button>
                   {dropdownOpen[item.id] ? (
                     <select
                       className="status-dropdown-standard status-dropdown-inline"
                       autoFocus
                       value={item.status !== 'Received' ? item.status : ''}
-                      onChange={e => updateStatus(item.id, e.target.value)}
+                      onChange={(e) => updateStatus(item.id, e.target.value)}
                       onBlur={() => handleDropdown(item.id, false)}
                     >
                       <option value="" disabled>Choose</option>
-                      {statusOptions.map(opt => (
+                      {statusOptions.map((opt) => (
                         <option key={opt} value={opt}>{opt}</option>
                       ))}
                     </select>
@@ -181,5 +158,4 @@ export default function InventoryTable() {
       </tbody>
     </table>
   );
->>>>>>> dcae7d5c4401c771acaa0939f667aebb40e6acfa
 }

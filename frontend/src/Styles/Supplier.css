@@ -26,7 +26,7 @@
 }
 
 .add-button {
-  background-color: #2563eb;
+  background-color: #162c5c;
   color: white;
   padding: 10px 20px;
   width: 100%;
@@ -51,7 +51,7 @@
 
 .quick-links a {
   display: block;
-  color: #2563eb;
+  color: #162c5c;
   text-decoration: none;
   margin-bottom: 8px;
 }
