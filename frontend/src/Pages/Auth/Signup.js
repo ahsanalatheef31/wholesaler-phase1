@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import '../../Styles/Signup.css'; 
+import { Link, useNavigate } from 'react-router-dom';
+import '../../Styles/Login.css'; // Reuse the same CSS
 import axios from 'axios';
+import PopupDialog from './PopupDialog';
 
 function Signup() {
   const [formData, setFormData] = useState({ username: '', email: '', password: '' });
-  const [error, setError] = useState('');
+  const [popup, setPopup] = useState({ open: false, type: 'success', title: '', message: '' });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -14,14 +15,15 @@ function Signup() {
   const handleSubmit = async e => {
     e.preventDefault();
     setLoading(true);
-    setError('');
-    
     try {
-      const res = await axios.post('http://localhost:8000/api/accounts/register/', formData);
-      alert('Signup successful! Please login with your credentials.');
-      navigate('/login');
+      await axios.post('http://localhost:8000/api/accounts/register/', formData);
+      setPopup({ open: true, type: 'success', title: 'Signup Successful', message: 'Your account has been created successfully.' });
+      setTimeout(() => {
+        setPopup({ ...popup, open: false });
+        navigate('/login');
+      }, 1200);
     } catch (err) {
-      setError('Signup failed: ' + JSON.stringify(err.response.data));
+      setPopup({ open: true, type: 'error', title: 'Signup Failed', message: 'Signup failed: ' + (err.response?.data?.username || err.response?.data?.email || 'Please check your details and try again.') });
     } finally {
       setLoading(false);
     }
@@ -29,6 +31,7 @@ function Signup() {
 
   return (
     <div className="main-background">
+      <PopupDialog {...popup} onClose={() => setPopup({ ...popup, open: false })} />
       <div className="main-box">
         <div className="form-box">
           <h2>Create Your Account</h2>
@@ -42,21 +45,16 @@ function Signup() {
             <span>Sign up with Google</span>
           </button>
           <div className="divider"><span>OR SIGN UP WITH EMAIL</span></div>
-          {error && <p className="error-message">{error}</p>}
           <form onSubmit={handleSubmit}>
             <input name="username" placeholder="Username" onChange={handleChange} required />
             <input name="email" type="email" placeholder="Email" onChange={handleChange} required />
             <input name="password" type="password" placeholder="Password" onChange={handleChange} required />
-            <button type="submit" className="login-btn" disabled={loading}>
-              {loading ? 'Signing up...' : 'Sign Up'}
-            </button>
+            <button type="submit" className="login-btn" disabled={loading}>{loading ? 'Signing up...' : 'Sign Up'}</button>
           </form>
-          <p className="signup-link">Already have an account? <a href="/login">Log in</a></p>
+          <p className="signup-link">Already have an account? <Link to="/login">Log in</Link></p>
         </div>
-
         <div className="image-box">
-<img src="/ima.png" alt="My Photo" width="400" />
-         
+          <img src="/ima.png" alt="My Photo" width="400" />
         </div>
       </div>
     </div>

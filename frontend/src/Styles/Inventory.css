@@ -189,3 +189,192 @@ textarea {
   background: #e2e8f0;
   color: #333;
 }
+
+.status-actions-row.modern {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-icon-btn-modern {
+  border: 1.5px solid #2d2a81;
+  background: #fff;
+  color: #2d2a81;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  margin: 0 1px;
+  transition: background 0.18s, color 0.18s, border 0.18s, box-shadow 0.18s;
+  box-shadow: 0 1px 4px rgba(44,44,44,0.07);
+  cursor: pointer;
+  outline: none;
+  padding: 0;
+}
+.status-icon-btn-modern.active,
+.status-icon-btn-modern:hover {
+  background: #2d2a81;
+  color: #fff;
+  border: 1.5px solid #2d2a81;
+}
+.status-icon-btn-modern svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+  transition: stroke 0.18s, fill 0.18s;
+}
+
+.status-pill-modern {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border-radius: 16px;
+  padding: 3px 16px 3px 10px;
+  font-size: 14px;
+  font-weight: 600;
+  min-width: 90px;
+  text-align: center;
+  letter-spacing: 0.5px;
+  box-shadow: 0 1px 4px rgba(44,44,44,0.07);
+  background: #e6eaff;
+  color: #2d2a81;
+  margin-left: 10px;
+  transition: background 0.2s, color 0.2s;
+}
+.status-pill-modern.Received {
+  background: #2d2a81;
+  color: #fff;
+}
+.status-pill-modern.Pending {
+  background: #ffc107;
+  color: #222;
+}
+.status-pill-modern.Defective {
+  background: #dc3545;
+  color: #fff;
+}
+.status-pill-modern.Returned {
+  background: #6c757d;
+  color: #fff;
+}
+.status-dot-modern {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 1px 2px rgba(44,44,44,0.10);
+  border: 2px solid #fff;
+}
+
+.status-dropdown-card.modern {
+  position: absolute;
+  z-index: 10;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(44,44,44,0.13);
+  padding: 8px 12px;
+  margin-top: 4px;
+  left: 0;
+  border: 1.5px solid #2d2a81;
+}
+.status-dropdown-card.modern select {
+  border-radius: 8px;
+  border: 1.5px solid #2d2a81;
+  padding: 6px 14px;
+  color: #2d2a81;
+  font-weight: 500;
+  background: #f4f6fa;
+  outline: none;
+  font-size: 15px;
+  transition: border 0.2s;
+}
+.status-dropdown-card.modern select:focus {
+  border: 1.5px solid #2d2a81;
+  background: #e6eaff;
+}
+
+.status-actions-row.standard {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: #fff;
+  border-radius: 8px;
+  padding: 0 2px;
+}
+
+.status-icon-btn-standard {
+  border: 1.2px solid #bbb;
+  background: #fff;
+  color: #444;
+  border-radius: 4px;
+  width: 32px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  margin: 0 1px;
+  transition: background 0.18s, color 0.18s, border 0.18s;
+  box-shadow: none;
+  cursor: pointer;
+  outline: none;
+  padding: 0 4px;
+}
+.status-icon-btn-standard.active {
+  background: #fff;
+  color: #2d2a81;
+  border: 1.2px solid #2d2a81;
+}
+.status-icon-btn-standard svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+  transition: stroke 0.18s, fill 0.18s;
+}
+.status-icon-btn-standard.active svg polyline {
+  stroke: #2d2a81 !important;
+}
+.status-icon-btn-standard.active svg line {
+  stroke: #2d2a81 !important;
+}
+.status-icon-btn-standard:hover svg line {
+  stroke: #2d2a81 !important;
+}
+
+.status-dropdown-standard {
+  display: inline-block;
+  border-radius: 6px;
+  border: 1.2px solid #bbb;
+  padding: 2px 8px;
+  color: #222;
+  font-weight: 500;
+  background: #fff;
+  outline: none;
+  font-size: 13px;
+  margin-left: 6px;
+  transition: border 0.2s;
+  height: 26px;
+  min-width: 70px;
+}
+.status-dropdown-inline {
+  height: 28px;
+  font-size: 15px;
+  margin-left: 8px;
+  vertical-align: middle;
+  padding: 0 8px;
+}
+.status-dropdown-standard:focus {
+  border: 1.2px solid #444;
+  background: #f4f6fa;
+}
+
+.status-text-standard {
+  color: #444;
+  font-weight: 600;
+  font-size: 13px;
+  margin-left: 8px;
+  letter-spacing: 0.2px;
+}

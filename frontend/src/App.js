@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
-import NavBar from './Components/Navbar';
+import Navbar from './Components/Navbar';
 import Profile from './Pages/Profile';
 import Dashboard from './Pages/Dashboard';
 import Inventory from './Pages/inventory/Inventory';
@@ -26,12 +26,16 @@ function AppWrapper() {
 
   return (
     <>
+<<<<<<< HEAD
       {!shouldHideNavbar && (
         <>
           <NavBar />
           <Header />
         </>
       )}
+=======
+      {!shouldHideNavbar && <Navbar />}
+>>>>>>> dcae7d5c4401c771acaa0939f667aebb40e6acfa
 
       <Routes>
         {/* Public routes */}

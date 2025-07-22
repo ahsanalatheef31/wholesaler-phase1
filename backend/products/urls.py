@@ -11,7 +11,11 @@ urlpatterns = [
     path('extract-pdf/', views.extract_pdf),
     path('add-product/', views.add_product),
     path('delete-product/<int:product_id>/', views.delete_product),
+<<<<<<< HEAD
     path('', include(router.urls)),
     path('suppliers/<int:supplier_id>/products/',  views.get_supplier_products),
 
+=======
+    path('update-status/<int:product_id>/', views.update_status),
+>>>>>>> dcae7d5c4401c771acaa0939f667aebb40e6acfa
 ]

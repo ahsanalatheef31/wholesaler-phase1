@@ -33,13 +33,11 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding-top: 20px;
   
 }
 
 .form-box h2 {
   margin-bottom: 20px;
-  margin-top: 70px;
    
 }
 
@@ -86,9 +84,8 @@ form input {
 }
 
 .signup-link {
-  margin-top: 10px;
+  margin-top: 15px;
   font-size: 14px;
-  padding-bottom: 30px;
 }
 
 .image-box {
@@ -120,3 +117,9 @@ form input {
 .image-box img {
   transform: scale(2.4);
 }
+
+
+
+
+
+
