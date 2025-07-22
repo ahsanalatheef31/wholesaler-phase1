@@ -4,14 +4,14 @@ import Profile from './Pages/Profile';
 import Dashboard from './Pages/Dashboard';
 import Inventory from './Pages/inventory/Inventory';
 import Orders from './Pages/Orders';
-import Supplier from './Pages/Supplier';
+import Supplier from './Pages/Supplier/Supplier';
 import Reports from './Pages/Reports';
 import Login from './Pages/Auth/login';
 import Signup from './Pages/Auth/Signup';
 import ProtectedRoute from './Components/ProtectedRoute';
 import PublicRoute from './Components/PublicRoute';
 import { AuthProvider, useAuth } from './Context/AuthContext';
-
+import Header from './Components/Header';
 function AppWrapper() {
   const location = useLocation();
   const { isAuthenticated, loading } = useAuth();
@@ -26,7 +26,12 @@ function AppWrapper() {
 
   return (
     <>
-      {!shouldHideNavbar && <NavBar />}
+      {!shouldHideNavbar && (
+        <>
+          <NavBar />
+          <Header />
+        </>
+      )}
 
       <Routes>
         {/* Public routes */}

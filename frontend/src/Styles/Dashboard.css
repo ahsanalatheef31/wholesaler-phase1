@@ -1,6 +1,6 @@
 .dashboard-hero {
   position: relative;
-  width: 95%;
+  width: 80%;
   max-width: 1300px;
   height: 600px;
   margin: 20px auto;
@@ -13,7 +13,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 70px;
+  margin-top: 60px;
+  margin-left: 18%;
 }
 
 .overlay {

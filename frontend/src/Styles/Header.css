@@ -1,0 +1,47 @@
+.top-header {
+  position: fixed;
+  top: 2px;
+  right: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 1001;
+  margin-top: 2px;
+  padding-top: -5%;
+  height: 50px;
+}
+
+.logout {
+  background: white;
+  border: none;
+  color: #0b0434;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+
+.logout:hover {
+  background-color: #f0f0f0;
+}
+
+.profile-picture img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ffffff;
+  outline: 2px solid #0b0434;
+  cursor: pointer;
+  margin-top: 6px;
+  transition: transform 0.2s ease;
+}
+
+
+.profile-picture img:hover {
+  transform: scale(1.05);
+}

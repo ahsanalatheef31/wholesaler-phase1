@@ -1,46 +1,54 @@
-
 .navbar {
   position: fixed;
   top: 0;
   left: 0;
-  height: 60px;
-  width: 100%;
+  height: 100vh; /* Full height of viewport */
+  width: 200px; /* Adjust as needed */
   background-color: #0b0434;
   display: flex;
+  flex-direction: column; /* Vertical layout */
   align-items: center;
-  justify-content: space-between;
-  padding: 0 30px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  justify-content: flex-start;
+  padding: 30px 10px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
   z-index: 1000;
-  
 }
-.logout {
-   background: none;
-   border: none;
-   color: #fff;
-   cursor: pointer;
-   font-size: 14px;
-   padding: 5px 10px;
-   border-radius: 4px;
-   background-color: rgba(255, 255, 255, 0.1);
-   margin-right: 120px;
-}
+
 
 .header {
   font-size: 22px;
   font-weight: bold;
-  color: #ffffff; 
+  color: #ffffff;
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin: 0;
+  margin-bottom: 30px;
+  text-align: center;
+  align-items: flex-start;
+}
+
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  align-items: flex-start;
+  margin-left: 40px;
+}
+
+.links a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.links a:hover {
+  color: #6c6961;
 }
 
 .profile-picture {
-  position: absolute;
-  right: 90px;
-  display: flex;
-  align-items: center;
-  height: 100%;
+  margin-top: auto; /* Push to bottom */
+  margin-bottom: 30px;
 }
 
 .profile-picture img {
@@ -57,30 +65,18 @@
   transform: scale(1.05);
 }
 
-
-
-.links {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 60px;
-}
-
-
-.links a {
-  color: white;
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 16px;
-}
-
-.links a:hover {
-  color: #6c6961;
- 
+.logout {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 body {
   font-family: 'Times New Roman', Times, serif;
-  
+  margin-left: 200px; /* Add left margin to prevent overlap with sidebar */
 }

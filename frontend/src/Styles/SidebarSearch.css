@@ -1,0 +1,37 @@
+.sidebar-search {
+  margin-bottom: 20px;
+}
+
+.sidebar-search-input {
+  width: 92%;
+ padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.search-results {
+  background: #f9f9f9;
+  padding: 7px;
+  border-radius: 6px;
+  max-height:fit-content;
+  overflow-y: auto;
+}
+
+.search-results ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.search-results li {
+  padding: 6px 0;
+  border-bottom: 1px solid #ddd;
+  font-size: 14px;
+}
+
+.no-match {
+  font-size: 13px;
+  color: #999;
+}

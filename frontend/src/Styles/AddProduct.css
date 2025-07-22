@@ -1,205 +1,193 @@
+/* AddProduct.css */
+
 .add-product-container {
-  padding: 40px;
-  max-width: 700px;
-  margin: 40px auto;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.08);
-  font-family: 'Segoe UI', sans-serif;
+    max-width: 700px;
+    margin: auto;
+    width: 530px;
+    padding: 50px;
+    height: 600px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    position: relative;
+}
+
+/* Make the actions row sticky at the bottom of the form */
+.beautified-actions-row {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 8px;
+    margin-bottom: 0;
+    position: sticky;
+    bottom: 0;
+    background: white;
+    padding-bottom: 10px;
+    z-index: 2;
 }
 
 .form-heading {
-  font-size: 22px;
-  font-weight: 600;
-  margin-bottom: 24px;
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 20px;
 }
 
 .form-inputs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    width:500px;
+    
+    gap: 10px;
 }
 
-.input-field,
-.textarea-field,
-select {
-  padding: 12px;
-  flex: 1 1 48%;
-  min-width: 200px;
-  border: 1px solid #d1d1d1;
-  border-radius: 6px;
-  font-size: 14px;
-  outline: none;
-  transition: border 0.2s ease;
+.input-field {
+    margin-bottom: 15px;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: border-color 0.3s;
+    margin-right: 30px;
 }
 
-.input-field:focus,
-.textarea-field:focus,
-select:focus {
-  border-color: #4a90e2;
+.input-field:focus {
+    border-color: #007bff;
+    outline: none;
 }
 
-select {
-  background-color: #f2f2f7;
-}
-
-.textarea-field {
-  flex: 1 1 100%;
-  min-height: 100px;
-  resize: vertical;
+.select-category {
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
 }
 
 .file-label {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
-  min-width: 120px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  background-color: #f1f1f1;
-  text-align: center;
-  cursor: pointer;
-  font-size: 14px;
-  color: #333;
-  transition: all 0.2s ease;
+    margin: 15px 0;
+    display: inline-block;
+    padding: 10px 15px;
+    background-color: #f8f9fa;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-align: center;
+    cursor: pointer;
 }
 
 .file-label:hover {
-  background-color: #e8e8e8;
-  border-color: #4a90e2;
+    background-color: #e2e6ea;
 }
 
-.file-label:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.add-button, .cancel-button, .save-button {
+    padding: 10px 20px;
+    margin-top: 10px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
 }
 
 .add-button {
-  padding: 12px 18px;
-  background-color: #1a73e8;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  font-weight: 500;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.add-button:hover {
-  background-color: #0f5ed7;
-}
-
-.product-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 20px;
-  font-size: 14px;
-}
-
-.product-table th,
-.product-table td {
-  border: 1px solid #ccc;
-  padding: 10px;
-  text-align: left;
-}
-
-.quantity-cell {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.delete-button {
-  padding: 6px 12px;
-  background-color: #dc3545;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.delete-button:hover {
-  background-color: #c82333;
-}
-
-.save-button {
-  padding: 12px 24px;
-  background-color: #28a745;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  font-weight: 500;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.save-button:hover {
-  background-color: #218838;
+    background-color: #007bff;
+    color: white;
 }
 
 .cancel-button {
-  padding: 12px 24px;
-  background-color: #6c757d;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  font-weight: 500;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background 0.2s ease;
+    background-color: #f8f9fa;
+    color: black;
+    border: 1px solid #ccc;
+}
+
+.save-button {
+    background-color: #007bff;
+    color: white;
+    margin-top: 20px;
+}
+
+.add-button:hover, .save-button:hover {
+    background-color: #0056b3;
 }
 
 .cancel-button:hover {
-  background-color: #5a6268;
+    background-color: #e2e6ea;
 }
 
-.actions {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-  margin-top: 20px;
+.message, .error-message {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 4px;
 }
 
 .message {
-  margin-bottom: 10px;
-  padding: 10px;
-  border-radius: 4px;
-  font-size: 14px;
+    background-color: #e6ffe6;
+    color: #155724;
 }
 
 .error-message {
-  color: #721c24;
-  background-color: #f8d7da;
-  border: 1px solid #f5c6cb;
-  margin-bottom: 10px;
-  padding: 10px;
-  border-radius: 4px;
-  font-size: 14px;
+    background-color: #ffe6e6;
+    color: #721c24;
 }
 
-/* Loading state styles */
-.file-label.loading {
-  background-color: #e3f2fd;
-  border-color: #2196f3;
-  color: #1976d2;
+.product-table {
+    margin-top: 20px;
+    width: 100%;
+    border-collapse: collapse;
 }
 
-/* Success message styles */
-.message.success {
-  color: #155724;
-  background-color: #d4edda;
-  border: 1px solid #c3e6cb;
+.product-table th, .product-table td {
+    padding: 10px;
+    border: 1px solid #ccc;
+    text-align: left;
 }
 
-/* Error message styles */
-.message.error {
-  color: #721c24;
-  background-color: #f8d7da;
-  border: 1px solid #f5c6cb;
+.product-table th {
+    background-color: #f8f9fa;
+}
+
+.delete-button {
+    padding: 5px 10px;
+    color: white;
+    background-color: #dc3545;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.delete-button:hover {
+    background-color: #c82333;
+}
+
+/* Additional styles */
+.beautified-fields-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.dropdown-list {
+    position: absolute;
+    z-index: 10;
+    border: 1px solid #ccc;
+    background-color: white;
+    width: 280px;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.dropdown-item {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.dropdown-item:hover {
+    background-color: #e2e6ea;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .beautified-fields-row {
+        grid-template-columns: 1fr;
+    }
 }

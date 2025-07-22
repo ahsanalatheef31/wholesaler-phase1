@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../../Styles/Inventory.css'
 
-const columns = ["Product", "Model ID", "Size", "Stock", "Price", "Actions"];
+const columns = ["Product", "Model ID", "Size", "Stock", "Price", "Supplier", "Actions"];
 
 export default function InventoryTable (){
     const [products, setProducts] = useState([]);
@@ -59,7 +59,7 @@ export default function InventoryTable (){
         <tbody>
           {products.length === 0 ? (
             <tr>
-              <td colSpan={6} style={{ textAlign: 'center', padding: '20px' }}>
+              <td colSpan={7} style={{ textAlign: 'center', padding: '20px' }}>
                 No products found. Add some products to get started!
               </td>
             </tr>
@@ -79,6 +79,7 @@ export default function InventoryTable (){
                 <td>{item.size}</td>
                 <td>{item.pieces}</td>
                 <td>₹{parseFloat(item.price).toFixed(2)}</td>
+                <td>{item.supplier_name ? item.supplier_name : 'N/A'}</td>
                 <td>
                   <span className="edit-link">Edit</span> 
                   <span className="delete-link" onClick={() => handleDelete(item.id)}>Delete</span>

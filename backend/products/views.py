@@ -2,8 +2,13 @@ import fitz  # PyMuPDF
 import re
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Product
+from .models import Product,  Supplier
 from .serializers import ProductSerializer
+from .models import Supplier
+from .serializers import SupplierSerializer
+from rest_framework import viewsets
+
+
 
 @api_view(['GET'])
 def get_products(request):
@@ -99,6 +104,7 @@ def add_product(request):
                 'price': request.data[f'products[{i}][price]'],
                 'size': request.data[f'products[{i}][size]'],
                 'pieces': request.data[f'products[{i}][pieces]'],
+                'supplier': request.data.get(f'products[{i}][supplier]', None),
             }
             products_data.append(product_data)
             i += 1
@@ -118,3 +124,17 @@ def add_product(request):
         print(f"❌ Error in add_product: {str(e)}")
         return Response({'error': str(e)}, status=500)
         return Response({'error': str(e)}, status=500)
+    
+
+class SupplierViewSet(viewsets.ModelViewSet):
+    queryset = Supplier.objects.all()
+    serializer_class = SupplierSerializer    
+
+
+
+from django.http import JsonResponse
+
+def get_supplier_products(request, supplier_id):
+    products = Product.objects.filter(supplier_id=supplier_id)
+    product_list = [{"id": p.id, "name": p.name} for p in products]
+    return JsonResponse(product_list, safe=False)

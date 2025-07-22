@@ -1,0 +1,77 @@
+.supplier-container {
+  display: flex;
+  background-color: #f8f9fb;
+  min-height: 100vh;
+  width:83.5%;
+  margin-left: 16%;
+}
+
+.sidebar {
+  width: 280px;
+  background-color: white;
+  padding: 20px;
+  position: fixed;
+  border-radius: 8px;
+  margin-right: 0%;
+  height: 100vh;
+  justify-content: flex-start;
+  padding-top: 30px;
+  margin-left: 62%;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}
+
+.sidebar h2 {
+  margin-bottom: 20px;
+  font-size: 22px;
+}
+
+.add-button {
+  background-color: #2563eb;
+  color: white;
+  padding: 10px 20px;
+  width: 100%;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+
+.search-box {
+  width: 92%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-bottom: 20px;
+}
+
+.quick-links h4 {
+  margin-bottom: 10px;
+}
+
+.quick-links a {
+  display: block;
+  color: #2563eb;
+  text-decoration: none;
+  margin-bottom: 8px;
+}
+
+.main-content {
+  flex: 1;
+  padding: 20px;
+  margin-right: 300px;
+  
+}
+
+.supplier-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.card-grid {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}

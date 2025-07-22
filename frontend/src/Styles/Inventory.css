@@ -1,13 +1,15 @@
 .inventory-container {
   max-width: 1250px;
   height: fit-content;
-  margin: 20px auto;
+  margin: 15px auto;
   background: #fff;
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   font-family: 'Segoe UI', sans-serif;
-  margin-top: 70px;
+  width: 81%;
+  margin-top: 5px;
+  margin-left: 16%;
 }
 body {
     background-color: #e2dede;
@@ -27,6 +29,7 @@ body {
 .add-btn {
   background-color: #2563eb;
   color: #fff;
+  margin-top: 40px;
   padding: 8px 16px;
   border-radius: 8px;
   border: none;
