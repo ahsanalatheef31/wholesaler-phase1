@@ -124,7 +124,6 @@ def add_product(request):
         print(f"❌ Error in add_product: {str(e)}")
         return Response({'error': str(e)}, status=500)
         return Response({'error': str(e)}, status=500)
-<<<<<<< HEAD
     
 
 class SupplierViewSet(viewsets.ModelViewSet):
@@ -139,7 +138,6 @@ def get_supplier_products(request, supplier_id):
     products = Product.objects.filter(supplier_id=supplier_id)
     product_list = [{"id": p.id, "name": p.name} for p in products]
     return JsonResponse(product_list, safe=False)
-=======
 
 @api_view(['POST'])
 def update_status(request, product_id):
@@ -153,4 +151,3 @@ def update_status(request, product_id):
         return Response({'status': 'success', 'new_status': product.status})
     except Product.DoesNotExist:
         return Response({'error': 'Product not found'}, status=404)
->>>>>>> dcae7d5c4401c771acaa0939f667aebb40e6acfa
