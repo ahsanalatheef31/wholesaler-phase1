@@ -24,7 +24,7 @@ const icons = {
   ),
 };
 
-export default function PopupDialog({ open, type = 'success', title, message, onClose }) {
+export default function PopupDialog({ open, type = 'success', title, message, onClose, children }) {
   if (!open) return null;
   return (
     <div className="popup-overlay">
@@ -33,6 +33,7 @@ export default function PopupDialog({ open, type = 'success', title, message, on
         <div className="popup-icon-wrapper">{icons[type]}</div>
         <div className="popup-title">{title}</div>
         <div className="popup-message">{message}</div>
+        {children}
       </div>
     </div>
   );

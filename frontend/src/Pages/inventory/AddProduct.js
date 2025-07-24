@@ -156,6 +156,7 @@ const AddProduct = () => {
         if (product.image) {
           payload.append(`products[${index}][image]`, product.image);
         }
+        payload.append(`products[${index}][bill_number]`, product.bill_number || billNumber);
       });
       await fetch('http://localhost:8000/api/add-product/', {
         method: 'POST',

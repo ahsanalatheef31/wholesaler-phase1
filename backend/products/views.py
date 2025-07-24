@@ -93,6 +93,7 @@ def extract_pdf(request):
 @api_view(['POST'])
 def add_product(request):
     try:
+        from .models import Invoice
         products_data = []
         i = 0
         while f'products[{i}][name]' in request.data:
@@ -103,22 +104,21 @@ def add_product(request):
                 'size': request.data[f'products[{i}][size]'],
                 'pieces': request.data[f'products[{i}][pieces]'],
                 'supplier': request.data.get(f'products[{i}][supplier]', None),
-                'bill_number': request.data.get(f'products[{i}][bill_number]', None),
             }
-            # Link to invoice if bill_number is provided
-            invoice = None
-            if product_data['bill_number']:
+            bill_number = request.data.get(f'products[{i}][bill_number]', None)
+            if bill_number:
                 try:
-                    invoice = Invoice.objects.get(bill_number=product_data['bill_number'])
+                    invoice = Invoice.objects.get(bill_number=bill_number)
+                    product_data['invoice'] = invoice
                 except Invoice.DoesNotExist:
-                    invoice = None
-            product_data['invoice'] = invoice.id if invoice else None
+                    return Response({'error': f"Bill number '{bill_number}' does not exist. Please select a valid bill number."}, status=400)
+            else:
+                product_data['invoice'] = None
             products_data.append(product_data)
             i += 1
         print(f"Received {len(products_data)} products to save")
         print("Products data:", products_data)
         for pd in products_data:
-            pd.pop('bill_number', None)
             # Set supplier as instance
             if pd['supplier']:
                 try:
@@ -127,14 +127,6 @@ def add_product(request):
                     pd['supplier'] = None
             else:
                 pd['supplier'] = None
-            # Set invoice as instance
-            if pd['invoice']:
-                try:
-                    pd['invoice'] = Invoice.objects.get(id=pd['invoice'])
-                except Invoice.DoesNotExist:
-                    pd['invoice'] = None
-            else:
-                pd['invoice'] = None
             try:
                 pd['price'] = Decimal(pd['price'])
             except Exception:
@@ -235,17 +227,7 @@ def create_invoice(request):
                 size=item['size'],
                 quantity=item['quantity'],
             )
-            # Also create a Product linked to this invoice
-            Product.objects.create(
-                name=item['product'],
-                model_no=item['model_id'],
-                price=item['price'],
-                size=item['size'],
-                pieces=item['quantity'],
-                invoice=invoice,
-                # Optionally set supplier if available
-                supplier=item.get('supplier')
-            )
+            # Removed: Product.objects.create(...)
 
         return JsonResponse({'success': True})
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../../Styles/Inventory.css';
 import { useNavigate } from 'react-router-dom';
+import PopupDialog from '../Auth/PopupDialog';
 
 const columns = ["Product", "Model ID", "Size", "Stock", "Price", "Supplier", "Bill Number", "Actions", "status"];
 const statusOptions = ["Pending", "Defective", "Returned"];
@@ -16,6 +17,7 @@ export default function InventoryTable() {
   const [billNumbers, setBillNumbers] = useState([]);
   const [supplierDropdownOpen, setSupplierDropdownOpen] = useState(false);
   const [billDropdownOpen, setBillDropdownOpen] = useState(false);
+  const [deleteDialog, setDeleteDialog] = useState({ open: false, productId: null });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -56,16 +58,24 @@ export default function InventoryTable() {
     }
   };
 
-  const handleDelete = async (productId) => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
-      try {
-        await axios.delete(`http://localhost:8000/api/delete-product/${productId}/`);
-        fetchProducts();
-      } catch (err) {
-        console.error('Error deleting product:', err);
-        alert('Failed to delete product');
-      }
+  const handleDelete = (productId) => {
+    setDeleteDialog({ open: true, productId });
+  };
+
+  const confirmDelete = async () => {
+    try {
+      await axios.delete(`http://localhost:8000/api/delete-product/${deleteDialog.productId}/`);
+      setDeleteDialog({ open: false, productId: null });
+      fetchProducts();
+    } catch (err) {
+      console.error('Error deleting product:', err);
+      alert('Failed to delete product');
+      setDeleteDialog({ open: false, productId: null });
     }
+  };
+
+  const cancelDelete = () => {
+    setDeleteDialog({ open: false, productId: null });
   };
 
   const updateStatus = async (productId, status) => {
@@ -325,6 +335,17 @@ export default function InventoryTable() {
           )}
         </tbody>
       </table>
+      <PopupDialog
+        open={deleteDialog.open}
+        type="warning"
+        title="Delete Product?"
+        message="Are you sure you want to delete this product?"
+        onClose={cancelDelete}
+      >
+        <div style={{ marginTop: 16, display: 'flex', justifyContent: 'center' }}>
+          <button className="delete-btn-blue" onClick={confirmDelete}>Yes, Delete</button>
+        </div>
+      </PopupDialog>
     </>
   );
 }
