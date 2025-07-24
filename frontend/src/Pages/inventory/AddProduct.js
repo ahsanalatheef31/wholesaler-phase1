@@ -20,9 +20,14 @@ const AddProduct = () => {
   const [suppliers, setSuppliers] = useState([]);
   const [supplierSearch, setSupplierSearch] = useState('');
   const [showSupplierModal, setShowSupplierModal] = useState(false);
+  const [billNumber, setBillNumber] = useState('');
+  const [billNumberList, setBillNumberList] = useState([]);
+  const [showBillDropdown, setShowBillDropdown] = useState(false);
+  const [editIndex, setEditIndex] = useState(null);
 
   useEffect(() => {
     fetchSuppliers();
+    fetchBillNumbers();
   }, []);
 
   const fetchSuppliers = async () => {
@@ -32,6 +37,16 @@ const AddProduct = () => {
       setSuppliers(data);
     } catch (err) {
       setSuppliers([]);
+    }
+  };
+
+  const fetchBillNumbers = async () => {
+    try {
+      const res = await fetch('http://localhost:8000/api/invoices/');
+      const data = await res.json();
+      setBillNumberList(data.map(inv => inv.bill_number));
+    } catch (err) {
+      setBillNumberList([]);
     }
   };
 
@@ -64,10 +79,25 @@ const AddProduct = () => {
     if (result.error) {
       setPdfError(result.error);
     } else {
-      setProducts([...products, ...result.products]);
+      // Assign the currently selected supplier to each extracted product
+      const supplierId = formData.supplier;
+      const productsWithSupplier = result.products.map(p => ({
+        ...p,
+        supplier: supplierId
+      }));
+      setProducts([...products, ...productsWithSupplier]);
       setMessage(result.message);
       e.target.value = '';
     }
+  };
+
+  const handleEditProduct = (index) => {
+    const productToEdit = products[index];
+    setFormData({ ...productToEdit });
+    setEditIndex(index);
+    setMessage('Editing product. Make changes and click "Add Product" to update.');
+    // Remove the product from the list while editing
+    setProducts(products.filter((_, i) => i !== index));
   };
 
   const addManualProduct = () => {
@@ -79,7 +109,18 @@ const AddProduct = () => {
       setMessage('❌ Please select a supplier');
       return;
     }
-    setProducts([...products, formData]);
+    // Always attach bill_number to the product
+    const productToAdd = { ...formData, bill_number: billNumber };
+    if (editIndex !== null) {
+      const updatedProducts = [...products];
+      updatedProducts.splice(editIndex, 0, productToAdd);
+      setProducts(updatedProducts);
+      setEditIndex(null);
+      setMessage('✅ Product updated');
+    } else {
+      setProducts([...products, productToAdd]);
+      setMessage('✅ Product added to list');
+    }
     setFormData({
       name: '',
       model_no: '',
@@ -88,8 +129,8 @@ const AddProduct = () => {
       pieces: '',
       image: null,
       supplier: '',
+      bill_number: '',
     });
-    setMessage('✅ Product added to list');
   };
 
   const handleDeleteProduct = (indexToRemove) => {
@@ -121,12 +162,23 @@ const AddProduct = () => {
         body: payload,
       });
       setMessage('✅ Products added successfully!');
-      setTimeout(() => {
-        window.location.href = '/inventory';
-      }, 1500);
+      await waitForProduct(products[0].name);
+      window.location.href = '/inventory';
     } catch (error) {
       setMessage('❌ Failed to save products. Please try again.');
     }
+  };
+
+  const waitForProduct = async (productName) => {
+    for (let i = 0; i < 10; i++) { // try up to 10 times
+      const res = await fetch('http://localhost:8000/api/get-products/');
+      const data = await res.json();
+      if (data.some(p => p.name === productName)) {
+        return true;
+      }
+      await new Promise(resolve => setTimeout(resolve, 300));
+    }
+    return false;
   };
 
   // Filter suppliers for dropdown
@@ -170,6 +222,57 @@ const AddProduct = () => {
               </div>
             )}
           </div>
+          <div className="bill-number-field" style={{ position: 'relative', marginBottom: 16 }}>
+            <input
+              name="bill_number"
+              value={billNumber}
+              onChange={e => {
+                setBillNumber(e.target.value);
+                setShowBillDropdown(true);
+                fetchBillNumbers();
+              }}
+              onFocus={() => {
+                setShowBillDropdown(true);
+                fetchBillNumbers();
+              }}
+              placeholder="Bill Number"
+              autoComplete="off"
+              className="input-field"
+              style={{ width: 200 }}
+            />
+            {showBillDropdown && billNumberList.length > 0 && (
+              <div className="dropdown-list beautified-dropdown-list" style={{ position: 'absolute', zIndex: 30, background: '#fff', border: '1px solid #ccc', width: 200, maxHeight: 150, overflowY: 'auto' }}>
+                {billNumberList
+                  .filter(bn => bn.toLowerCase().includes(billNumber.toLowerCase()))
+                  .map(bn => (
+                    <div
+                      key={bn}
+                      className="dropdown-item beautified-dropdown-item"
+                      style={{ padding: 8, cursor: 'pointer' }}
+                      onClick={async () => {
+                        setBillNumber(bn);
+                        setShowBillDropdown(false);
+                        // Fetch invoice details
+                        const res = await fetch(`http://localhost:8000/api/invoices/${bn}/`);
+                        const data = await res.json();
+                        // Map invoice products to your product format
+                        const invoiceProducts = data.products.map(p => ({
+                          name: p.product_name,
+                          model_no: p.model_id,
+                          price: p.price,
+                          size: p.size,
+                          pieces: p.quantity,
+                          supplier: formData.supplier, // or set as needed
+                        }));
+                        setProducts(invoiceProducts);
+                      }}
+                    >
+                      {bn}
+                    </div>
+                  ))}
+              </div>
+            )}
+          </div>
           <label className="file-label">
             {pdfLoading ? 'Processing PDF...' : 'Select Bill (PDF)'}
             <input
@@ -207,6 +310,7 @@ const AddProduct = () => {
                 <th>Size</th>
                 <th>Quantity</th>
                 <th>Supplier</th>
+                <th>Bill Number</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -219,8 +323,10 @@ const AddProduct = () => {
                   <td>{p.size}</td>
                   <td>{p.pieces}</td>
                   <td>{suppliers.find(s => s.id === p.supplier)?.name || 'N/A'}</td>
+                  <td>{p.bill_number || billNumber || 'N/A'}</td>
                   <td>
-                    <button onClick={() => handleDeleteProduct(index)} className="delete-button">Delete</button>
+                    <span onClick={() => handleEditProduct(index)} style={{ color: 'blue', textDecoration: 'underline', cursor: 'pointer', marginRight: 10 }}>Edit</span>
+                    <span onClick={() => handleDeleteProduct(index)} style={{ color: 'red', textDecoration: 'underline', cursor: 'pointer' }}>Delete</span>
                   </td>
                 </tr>
               ))}

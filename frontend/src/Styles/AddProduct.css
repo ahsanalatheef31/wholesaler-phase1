@@ -191,3 +191,10 @@
         grid-template-columns: 1fr;
     }
 }
+.small-action-btn {
+    padding: 2px 8px;
+    font-size: 0.85em;
+    border-radius: 2px;
+    margin: 0 2px;
+    min-width: 30px;
+  }

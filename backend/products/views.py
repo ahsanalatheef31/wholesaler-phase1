@@ -7,6 +7,7 @@ from .serializers import ProductSerializer
 from .models import Supplier
 from .serializers import SupplierSerializer
 from rest_framework import viewsets
+from decimal import Decimal
 
 
 
@@ -92,10 +93,7 @@ def extract_pdf(request):
 @api_view(['POST'])
 def add_product(request):
     try:
-        # Handle FormData format from frontend
         products_data = []
-        
-        # Get all the product data from FormData
         i = 0
         while f'products[{i}][name]' in request.data:
             product_data = {
@@ -105,24 +103,51 @@ def add_product(request):
                 'size': request.data[f'products[{i}][size]'],
                 'pieces': request.data[f'products[{i}][pieces]'],
                 'supplier': request.data.get(f'products[{i}][supplier]', None),
+                'bill_number': request.data.get(f'products[{i}][bill_number]', None),
             }
+            # Link to invoice if bill_number is provided
+            invoice = None
+            if product_data['bill_number']:
+                try:
+                    invoice = Invoice.objects.get(bill_number=product_data['bill_number'])
+                except Invoice.DoesNotExist:
+                    invoice = None
+            product_data['invoice'] = invoice.id if invoice else None
             products_data.append(product_data)
             i += 1
-        
         print(f"Received {len(products_data)} products to save")
         print("Products data:", products_data)
-        
-        serializer = ProductSerializer(data=products_data, many=True)
-        if serializer.is_valid():
-            serializer.save()
-            print("✅ Successfully saved all products")
-            return Response({'status': 'success', 'message': f'{len(products_data)} products added successfully'})
-        else:
-            print("❌ Validation errors:", serializer.errors)
-            return Response(serializer.errors, status=400)
+        for pd in products_data:
+            pd.pop('bill_number', None)
+            # Set supplier as instance
+            if pd['supplier']:
+                try:
+                    pd['supplier'] = Supplier.objects.get(id=pd['supplier'])
+                except Supplier.DoesNotExist:
+                    pd['supplier'] = None
+            else:
+                pd['supplier'] = None
+            # Set invoice as instance
+            if pd['invoice']:
+                try:
+                    pd['invoice'] = Invoice.objects.get(id=pd['invoice'])
+                except Invoice.DoesNotExist:
+                    pd['invoice'] = None
+            else:
+                pd['invoice'] = None
+            try:
+                pd['price'] = Decimal(pd['price'])
+            except Exception:
+                pd['price'] = 0
+            try:
+                pd['pieces'] = int(pd['pieces'])
+            except Exception:
+                pd['pieces'] = 0
+            Product.objects.create(**pd)
+        print("✅ Successfully saved all products (manual create)")
+        return Response({'status': 'success', 'message': f'{len(products_data)} products added successfully'})
     except Exception as e:
         print(f"❌ Error in add_product: {str(e)}")
-        return Response({'error': str(e)}, status=500)
         return Response({'error': str(e)}, status=500)
     
 
@@ -151,3 +176,121 @@ def update_status(request, product_id):
         return Response({'status': 'success', 'new_status': product.status})
     except Product.DoesNotExist:
         return Response({'error': 'Product not found'}, status=404)
+
+@api_view(['POST'])
+def update_product(request, product_id):
+    try:
+        product = Product.objects.get(id=product_id)
+        data = request.data
+        # Update fields
+        product.name = data.get('name', product.name)
+        product.model_no = data.get('model_no', product.model_no)
+        product.price = data.get('price', product.price)
+        product.size = data.get('size', product.size)
+        product.pieces = data.get('pieces', product.pieces)
+        # Update supplier if provided
+        supplier_id = data.get('supplier')
+        if supplier_id:
+            try:
+                product.supplier = Supplier.objects.get(id=supplier_id)
+            except Supplier.DoesNotExist:
+                return Response({'error': 'Supplier not found'}, status=404)
+        # Update invoice if bill_number provided
+        bill_number = data.get('bill_number')
+        if bill_number:
+            from .models import Invoice
+            try:
+                product.invoice = Invoice.objects.get(bill_number=bill_number)
+            except Invoice.DoesNotExist:
+                return Response({'error': 'Invoice not found'}, status=404)
+        product.save()
+        return Response({'status': 'success', 'message': 'Product updated successfully'})
+    except Product.DoesNotExist:
+        return Response({'error': 'Product not found'}, status=404)
+# invoices/views.py (bottom of file)
+import json
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from .models import Invoice, InvoiceItem
+
+@csrf_exempt
+def create_invoice(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+
+        bill_number = data.get('bill_number')
+        items = data.get('items', [])
+
+        if not bill_number or not items:
+            return JsonResponse({'error': 'Missing bill number or items'}, status=400)
+
+        invoice = Invoice.objects.create(bill_number=bill_number)
+
+        for item in items:
+            InvoiceItem.objects.create(
+                invoice=invoice,
+                product_name=item['product'],
+                model_id=item['model_id'],
+                price=item['price'],
+                size=item['size'],
+                quantity=item['quantity'],
+            )
+            # Also create a Product linked to this invoice
+            Product.objects.create(
+                name=item['product'],
+                model_no=item['model_id'],
+                price=item['price'],
+                size=item['size'],
+                pieces=item['quantity'],
+                invoice=invoice,
+                # Optionally set supplier if available
+                supplier=item.get('supplier')
+            )
+
+        return JsonResponse({'success': True})
+
+from django.http import JsonResponse, Http404
+from .models import Invoice
+
+def invoice_details(request, bill_number):
+    try:
+        invoice = Invoice.objects.get(bill_number=bill_number)
+        products = invoice.items.all()  # corrected related_name
+
+        data = {
+            "bill_number": invoice.bill_number,
+            "created_at": invoice.created_at.strftime("%Y-%m-%d"),
+            "products": [
+                {
+                    "product_name": p.product_name,
+                    "model_id": p.model_id,
+                    "price": str(p.price),  # Convert Decimal to str for JSON
+                    "size": p.size,
+                    "quantity": p.quantity
+                } for p in products
+            ]
+        }
+
+        return JsonResponse(data)
+    except Invoice.DoesNotExist:
+        raise Http404("Invoice not found")
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from .models import Invoice
+
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from .models import Invoice
+
+@csrf_exempt
+def list_invoices(request):
+    if request.method == "GET":
+        invoices = Invoice.objects.all().order_by('-created_at')
+        data = [
+            {
+                "bill_number": invoice.bill_number,
+                "created_at": invoice.created_at.strftime("%Y-%m-%d"),
+            }
+            for invoice in invoices
+        ]
+        return JsonResponse(data, safe=False)

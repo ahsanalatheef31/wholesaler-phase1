@@ -1,0 +1,53 @@
+/* InvoiceDetails.css */
+
+.invoice-details-container {
+  margin-left: 18%;  /* Shift content to the right to avoid overlap with sidebar/navbar */
+  padding: 20px;
+  background-color: #f9f9f9;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* Styling for the bill number heading */
+.invoice-details-container h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Table styles */
+.invoice-details-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.invoice-details-table th,
+.invoice-details-table td {
+  border: 1px solid #ddd;
+  padding: 12px 16px;
+  text-align: left;
+}
+
+.invoice-details-table th {
+  background-color: #f2f2f2;
+  color: #555;
+}
+
+.invoice-details-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+  .invoice-details-container {
+    margin-left: 0;
+    padding: 15px;
+  }
+
+  .invoice-details-table th,
+  .invoice-details-table td {
+    padding: 10px;
+  }
+}
