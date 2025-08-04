@@ -30,7 +30,11 @@ class ProductSerializer(serializers.ModelSerializer):
 class SupplierSerializer(serializers.ModelSerializer):
     class Meta:
         model = Supplier
-        fields = '__all__'        
+        fields = '__all__'
+    
+
+    
+        
         # invoices/serializers.py
 
 from rest_framework import serializers

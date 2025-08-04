@@ -8,8 +8,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
-  
+  z-index: 9999;
 }
 
 .modal {
@@ -18,6 +17,8 @@
   width: 450px;
   padding: 25px;
   box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  position: relative;
+  z-index: 10000;
 }
 
 .modal-header {
@@ -79,4 +80,34 @@
   border: none;
   border-radius: 6px;
   cursor: pointer;
+}
+
+/* Ensure modal is above everything */
+.modal-overlay {
+  position: fixed !important;
+  z-index: 9999 !important;
+}
+
+.modal {
+  position: relative !important;
+  z-index: 10000 !important;
+  background-color: white !important;
+}
+
+/* Hide any elements behind the modal */
+.modal-overlay::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0,0,0,0.4);
+  z-index: 9998;
+}
+
+/* Ensure modal content is above the overlay */
+.modal > * {
+  position: relative;
+  z-index: 10001;
 }

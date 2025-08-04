@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../Styles/invoice.css";
+import { extractProductsFromPdf } from "../inventory/pdfExtractUtils";
 
 export default function Invoice() {
   const [showModal, setShowModal] = useState(false);
@@ -29,16 +30,52 @@ export default function Invoice() {
     fetchInvoices();
   }, []);
 
-  const handleFileChange = (e) => {
+  const [pdfLoading, setPdfLoading] = useState(false);
+  const [pdfError, setPdfError] = useState('');
+
+  const handleFileChange = async (e) => {
     const uploadedFile = e.target.files[0];
     setFile(uploadedFile);
-    const dummyData = [
-      { id: 1, name: "Dominos", model: "A2485", price: "189999", size: "16 inch", quantity: 5 },
-      { id: 2, name: "Pepsi", model: "P1234", price: "599", size: "1L", quantity: 10 },
-    ];
-    setTableData(dummyData);
+    setPdfLoading(true);
+    setPdfError('');
+    
+    // Generate a unique bill number
     setBillNumber("INV" + Date.now());
+    
+    if (uploadedFile && uploadedFile.name.toLowerCase().endsWith('.pdf')) {
+      try {
+        const result = await extractProductsFromPdf(uploadedFile);
+        setPdfLoading(false);
+        
+        if (result.error) {
+          setPdfError(result.error);
+          // Still add an empty row for manual entry
+          setTableData([{ id: Date.now(), name: "", model: "", price: "", size: "", quantity: 1 }]);
+        } else {
+          // Convert extracted products to table format
+          const extractedProducts = result.products.map((product, index) => ({
+            id: Date.now() + index,
+            name: product.name || "",
+            model: product.model_no || product.model || "",
+            price: product.price || "",
+            size: product.size || "",
+            quantity: product.pieces || product.quantity || 1
+          }));
+          setTableData(extractedProducts);
+        }
+      } catch (error) {
+        setPdfLoading(false);
+        setPdfError('Failed to process PDF. Please try again.');
+        setTableData([{ id: Date.now(), name: "", model: "", price: "", size: "", quantity: 1 }]);
+      }
+    } else {
+      setPdfLoading(false);
+      // For non-PDF files, just add an empty row
+      setTableData([{ id: Date.now(), name: "", model: "", price: "", size: "", quantity: 1 }]);
+    }
   };
+
+
 
   const handleDelete = (id) => {
     setTableData(prev => prev.filter(item => item.id !== id));
@@ -113,20 +150,31 @@ export default function Invoice() {
           </tbody>
         </table>
         {/* Modal for adding invoice */}
+        {console.log('showModal value:', showModal)}
         {showModal && (
           <div className="modal-overlay">
             <div className="modal-content">
               <h3>Add New Invoice</h3>
-              <label htmlFor="invoice-file-upload" style={{ display: 'inline-block', background: '#2451a4', color: '#fff', padding: '10px 24px', borderRadius: 6, cursor: 'pointer', fontWeight: 500, fontSize: 16, marginBottom: 16 }}>
-                Choose Invoice
-                <input
-                  id="invoice-file-upload"
-                  type="file"
-                  accept=".pdf,.png,.jpg"
-                  onChange={handleFileChange}
-                  style={{ display: 'none' }}
-                />
-              </label>
+              <div style={{ marginBottom: 20 }}>
+                <label htmlFor="invoice-file-upload" style={{ display: 'inline-block', background: '#2451a4', color: '#fff', padding: '10px 24px', borderRadius: 6, cursor: 'pointer', fontWeight: 500, fontSize: 16 }}>
+                  {pdfLoading ? 'Processing PDF...' : 'Choose Invoice File'}
+                  <input
+                    id="invoice-file-upload"
+                    type="file"
+                    accept=".pdf,.png,.jpg"
+                    onChange={handleFileChange}
+                    style={{ display: 'none' }}
+                    disabled={pdfLoading}
+                  />
+                </label>
+                
+                {pdfError && (
+                  <div style={{ color: 'red', marginTop: '10px', padding: '10px', backgroundColor: '#ffe6e6', borderRadius: '4px' }}>
+                    ❌ {pdfError}
+                  </div>
+                )}
+              </div>
+              
               {tableData.length > 0 && (
                 <>
                   <table>
@@ -165,7 +213,17 @@ export default function Invoice() {
       <div style={{ width: 300, background: '#fafbfc', padding: 24, borderLeft: '1px solid #eee', minHeight: '100vh' }}>
         <div style={{ fontWeight: 'bold', marginBottom: 16 }}>Total Invoices: {invoiceList.length}</div>
         <h2 style={{ fontSize: 22, marginBottom: 16 }}>Invoice Actions</h2>
-        <button className="add-btn" style={{ width: '100%', marginBottom: 16 }} onClick={() => setShowModal(true)}>+ Add New Invoice</button>
+        <button 
+          className="add-btn" 
+          style={{ width: '100%', marginBottom: 16 }} 
+          onClick={() => {
+            console.log('Add invoice button clicked');
+            setShowModal(true);
+            console.log('showModal set to true');
+          }}
+        >
+          + Add New Invoice
+        </button>
         <input
           type="text"
           placeholder="Search invoices..."

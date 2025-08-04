@@ -8,6 +8,7 @@ from .models import Supplier
 from .serializers import SupplierSerializer
 from rest_framework import viewsets
 from decimal import Decimal
+from django.db import IntegrityError
 
 
 
@@ -25,6 +26,10 @@ def delete_product(request, product_id):
         return Response({'status': 'success'})
     except Product.DoesNotExist:
         return Response({'error': 'Product not found'}, status=404)
+
+
+
+
 
 @api_view(['POST'])
 def extract_pdf(request):
@@ -145,7 +150,55 @@ def add_product(request):
 
 class SupplierViewSet(viewsets.ModelViewSet):
     queryset = Supplier.objects.all()
-    serializer_class = SupplierSerializer    
+    serializer_class = SupplierSerializer
+    
+    def create(self, request, *args, **kwargs):
+        print("=== CREATE SUPPLIER CALLED ===")
+        print(f"Request data: {request.data}")
+        
+        name = request.data.get('name', '').strip()
+        email = request.data.get('email', '').strip()
+        
+        print(f"Checking name: '{name}'")
+        print(f"Checking email: '{email}'")
+        
+        # Check for duplicate name
+        if Supplier.objects.filter(name=name).exists():
+            print(f"Duplicate name found: {name}")
+            return Response({'error': 'User already found'}, status=400)
+        
+        # Check for duplicate email
+        if email and Supplier.objects.filter(email=email).exists():
+            print(f"Duplicate email found: {email}")
+            return Response({'error': 'User already found'}, status=400)
+        
+        print("No duplicates found, creating supplier...")
+        try:
+            result = super().create(request, *args, **kwargs)
+            print("Supplier created successfully")
+            return result
+        except IntegrityError as e:
+            print(f"IntegrityError caught: {str(e)}")
+            return Response({'error': 'User already found'}, status=400)
+        except Exception as e:
+            print(f"Other exception caught: {str(e)}")
+            # Handle other database constraint violations
+            error_str = str(e).lower()
+            if ('unique constraint failed' in error_str or 
+                'duplicate key' in error_str or 
+                'duplicate entry' in error_str or
+                '1062' in str(e)):  # MySQL duplicate entry error code
+                return Response({'error': 'User already found'}, status=400)
+            # Re-raise other exceptions
+            raise
+    
+
+    
+
+
+
+
+    
 
 
 

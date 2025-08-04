@@ -2,6 +2,7 @@ import React from 'react';
 import '../../Styles/SupplierCard.css';
 
 export default function SupplierCard({ supplier }) {
+
   return (
     <div className="supplier-card">
       <div className="supplier-header">
@@ -12,9 +13,7 @@ export default function SupplierCard({ supplier }) {
           <p><strong>Address:</strong> {supplier.address || 'N/A'}</p>
         </div>
       </div>
-      <div className="supplier-footer">
-        <button className="edit-button">Edit</button>
-      </div>
+
     </div>
   );
 }

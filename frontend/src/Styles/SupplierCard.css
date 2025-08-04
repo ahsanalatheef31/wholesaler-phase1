@@ -7,6 +7,8 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  position: relative;
+  overflow: visible;
 }
 
 .supplier-header {
@@ -43,6 +45,9 @@
   margin-top: 12px;
   display: flex;
   justify-content: flex-end;
+  gap: 8px;
+  z-index: 10;
+  position: relative;
 }
 
 .edit-button {
@@ -54,4 +59,24 @@
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
+  z-index: 10;
+  position: relative;
+}
+
+.delete-button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 10;
+  position: relative;
+  pointer-events: auto;
+}
+
+.delete-button:hover {
+  background-color: #c82333;
 }

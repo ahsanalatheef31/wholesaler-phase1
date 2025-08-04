@@ -23,6 +23,8 @@ export default function Supplier() {
     }
   };
 
+
+
   return (
     <div className="supplier-container">
       <main className="main-content">
@@ -33,7 +35,10 @@ export default function Supplier() {
 
         <div className="card-grid">
           {suppliers.map(supplier => (
-            <SupplierCard key={supplier.id} supplier={supplier} />
+            <SupplierCard 
+              key={supplier.id} 
+              supplier={supplier} 
+            />
           ))}
         </div>
       </main>
