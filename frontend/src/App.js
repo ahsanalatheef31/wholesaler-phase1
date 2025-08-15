@@ -21,6 +21,7 @@ import Header from './Components/Header';
 
 import Invoice from './Pages/invoice/Invoice'; // Make sure this file exists
 import InvoiceDetails from './Pages/invoice/InvoiceDetails';
+import BarcodePrinter from './Components/BarcodePrinter';
 
 function AppWrapper() {
   const location = useLocation();
@@ -125,6 +126,14 @@ function AppWrapper() {
           element={
             <ProtectedRoute>
               <InvoiceDetails />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/barcode-printer"
+          element={
+            <ProtectedRoute>
+              <BarcodePrinter />
             </ProtectedRoute>
           }
         />

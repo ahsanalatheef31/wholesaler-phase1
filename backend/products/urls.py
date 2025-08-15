@@ -1,5 +1,6 @@
 from django.urls import path,include
 from . import views
+from . import views_barcodes
 from rest_framework.routers import DefaultRouter
 from .views import SupplierViewSet
 
@@ -21,5 +22,7 @@ urlpatterns = [
     path('invoices/create/', views.create_invoice, name='invoice-create'),
     path('invoices/<str:bill_number>/', views.invoice_details, name='invoice-detail'),
     path('invoices/', views.list_invoices, name='invoice-list'),
+    # New barcode generation endpoint
+    path('generate-barcodes/', views_barcodes.generate_barcodes, name='generate_barcodes'),
     path('', include(router.urls)),
 ]

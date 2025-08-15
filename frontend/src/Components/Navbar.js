@@ -16,6 +16,7 @@ export default function Navbar(){
              <Link to="/supplier">Supplier</Link>
              <Link to="/reports">Reports</Link>
              <Link to="/invoice">Invoice</Link>
+             <Link to="/barcode-printer">Barcode Printer</Link>
              </div>
         </div>
         </div>
