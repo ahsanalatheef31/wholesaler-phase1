@@ -3,12 +3,14 @@ import React, { useState, useEffect } from 'react';
 import SupplierCard from './SupplierCard';
 import AddSupplierModal from './AddSupplierModal';
 import SidebarSearch from '../Supplier/SidebarSearch'
+import PopupDialog from '../Auth/PopupDialog';
 import '../../Styles/Supplier.css';
 import axios from 'axios';
 
 export default function Supplier() {
   const [suppliers, setSuppliers] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [deleteDialog, setDeleteDialog] = useState({ open: false, supplierId: null });
 
   useEffect(() => {
     fetchSuppliers();
@@ -21,6 +23,27 @@ export default function Supplier() {
     } catch (error) {
       console.error('Error fetching suppliers:', error);
     }
+  };
+
+  const handleDeleteSupplier = (supplierId) => {
+    setDeleteDialog({ open: true, supplierId });
+  };
+
+  const confirmDelete = async () => {
+    try {
+      await axios.delete(`http://localhost:8000/api/suppliers/${deleteDialog.supplierId}/`);
+      setDeleteDialog({ open: false, supplierId: null });
+      await fetchSuppliers();
+    } catch (error) {
+      console.error('Error deleting supplier:', error);
+      const msg = error?.response?.data?.detail || error?.response?.data?.error || 'Failed to delete supplier';
+      alert(msg);
+      setDeleteDialog({ open: false, supplierId: null });
+    }
+  };
+
+  const cancelDelete = () => {
+    setDeleteDialog({ open: false, supplierId: null });
   };
 
 
@@ -37,7 +60,8 @@ export default function Supplier() {
           {suppliers.map(supplier => (
             <SupplierCard 
               key={supplier.id} 
-              supplier={supplier} 
+              supplier={supplier}
+              onDelete={handleDeleteSupplier}
             />
           ))}
         </div>
@@ -55,6 +79,17 @@ export default function Supplier() {
           <a href="#">Expiring Contracts</a>
         </div>
       </aside>
+      <PopupDialog
+        open={deleteDialog.open}
+        type="warning"
+        title="Delete Supplier?"
+        message="Are you sure you want to delete this supplier? This will also delete all related products."
+        onClose={cancelDelete}
+      >
+        <div style={{ marginTop: 16, display: 'flex', justifyContent: 'center' }}>
+          <button className="delete-btn-blue" onClick={confirmDelete}>Yes, Delete</button>
+        </div>
+      </PopupDialog>
     </div>
   );
 }

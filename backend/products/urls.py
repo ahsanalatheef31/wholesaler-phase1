@@ -24,5 +24,9 @@ urlpatterns = [
     path('invoices/', views.list_invoices, name='invoice-list'),
     # New barcode generation endpoint
     path('generate-barcodes/', views_barcodes.generate_barcodes, name='generate_barcodes'),
+    path('categories/', views.get_categories, name='get_categories'),
+    path('sizes/', views.get_sizes, name='get_sizes'),
+    path('colors/', views.get_colors, name='get_colors'),
+    path('materials/', views.get_materials, name='get_materials'),
     path('', include(router.urls)),
 ]

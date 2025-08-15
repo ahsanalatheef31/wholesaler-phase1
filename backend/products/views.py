@@ -4,18 +4,86 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Product,  Supplier
 from .serializers import ProductSerializer
-from .models import Supplier
-from .serializers import SupplierSerializer
+from .models import Supplier, Category, Size, Color, Material
+from .serializers import SupplierSerializer, CategorySerializer, SizeSerializer, ColorSerializer, MaterialSerializer
 from rest_framework import viewsets
 from decimal import Decimal
 from django.db import IntegrityError
+from django.db.models import Q
 
 
 
 @api_view(['GET'])
 def get_products(request):
     products = Product.objects.all()
+    
+    # supplier filter
+    supplier_id = request.GET.get('supplier_id')
+    if supplier_id and supplier_id != 'all':
+        products = products.filter(supplier_id=supplier_id)
+
+    # category filter
+    category_id = request.GET.get('category_id')
+    if category_id and category_id != 'all':
+        products = products.filter(category_id=category_id)
+
+    # status filter
+    status = request.GET.get('status')
+    if status and status != 'all':
+        products = products.filter(status=status)
+
+    # size filter
+    size_id = request.GET.get('size_id')
+    if size_id and size_id != 'all':
+        products = products.filter(size_id=size_id)
+
+    # color filter
+    color_id = request.GET.get('color_id')
+    if color_id and color_id != 'all':
+        products = products.filter(color_id=color_id)
+
+    # material filter
+    material_id = request.GET.get('material_id')
+    if material_id and material_id != 'all':
+        products = products.filter(material_id=material_id)
+
+    # search query (searches name, model_no, and related fields)
+    search_query = request.GET.get('search')
+    if search_query:
+        products = products.filter(
+            Q(name__icontains=search_query) | 
+            Q(model_no__icontains=search_query) |
+            Q(category__name__icontains=search_query) |
+            Q(size__name__icontains=search_query) |
+            Q(color__name__icontains=search_query) |
+            Q(material__name__icontains=search_query)
+        )
+
     serializer = ProductSerializer(products, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def get_categories(request):
+    categories = Category.objects.all().order_by('name')
+    serializer = CategorySerializer(categories, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def get_sizes(request):
+    sizes = Size.objects.all().order_by('name')
+    serializer = SizeSerializer(sizes, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def get_colors(request):
+    colors = Color.objects.all().order_by('name')
+    serializer = ColorSerializer(colors, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def get_materials(request):
+    materials = Material.objects.all().order_by('name')
+    serializer = MaterialSerializer(materials, many=True)
     return Response(serializer.data)
 
 @api_view(['DELETE'])
@@ -132,6 +200,36 @@ def add_product(request):
                     pd['supplier'] = None
             else:
                 pd['supplier'] = None
+            
+            # Handle size field - convert string to Size object
+            if pd.get('size'):
+                try:
+                    pd['size'] = Size.objects.get(name=pd['size'])
+                except Size.DoesNotExist:
+                    # If size doesn't exist, create it
+                    pd['size'], _ = Size.objects.get_or_create(name=pd['size'])
+            else:
+                pd['size'] = None
+            
+            # Handle category field - try to assign based on product name if not provided
+            if not pd.get('category'):
+                product_name_lower = pd['name'].lower()
+                if any(keyword in product_name_lower for keyword in ['jeans', 'denim']):
+                    pd['category'] = Category.objects.filter(name__icontains='jeans').first()
+                elif any(keyword in product_name_lower for keyword in ['shirt', 't-shirt', 'tshirt']):
+                    pd['category'] = Category.objects.filter(name__icontains='t-shirt').first()
+                elif any(keyword in product_name_lower for keyword in ['saree', 'sari']):
+                    pd['category'] = Category.objects.filter(name__icontains='saree').first()
+                elif any(keyword in product_name_lower for keyword in ['salwar', 'kameez']):
+                    pd['category'] = Category.objects.filter(name__icontains='salwar').first()
+                elif any(keyword in product_name_lower for keyword in ['skirt']):
+                    pd['category'] = Category.objects.filter(name__icontains='skirt').first()
+                elif any(keyword in product_name_lower for keyword in ['top', 'blouse']):
+                    pd['category'] = Category.objects.filter(name__icontains='top').first()
+                else:
+                    # Default to T-shirts if no match found
+                    pd['category'] = Category.objects.filter(name__icontains='t-shirt').first()
+            
             try:
                 pd['price'] = Decimal(pd['price'])
             except Exception:
@@ -227,12 +325,45 @@ def update_product(request, product_id):
     try:
         product = Product.objects.get(id=product_id)
         data = request.data
-        # Update fields
+        
+        # Update basic fields
         product.name = data.get('name', product.name)
         product.model_no = data.get('model_no', product.model_no)
         product.price = data.get('price', product.price)
-        product.size = data.get('size', product.size)
         product.pieces = data.get('pieces', product.pieces)
+        
+        # Update size if provided
+        size_id = data.get('size')
+        if size_id:
+            try:
+                product.size = Size.objects.get(id=size_id)
+            except Size.DoesNotExist:
+                return Response({'error': 'Size not found'}, status=404)
+        
+        # Update category if provided
+        category_id = data.get('category')
+        if category_id:
+            try:
+                product.category = Category.objects.get(id=category_id)
+            except Category.DoesNotExist:
+                return Response({'error': 'Category not found'}, status=404)
+        
+        # Update color if provided
+        color_id = data.get('color')
+        if color_id:
+            try:
+                product.color = Color.objects.get(id=color_id)
+            except Color.DoesNotExist:
+                return Response({'error': 'Color not found'}, status=404)
+        
+        # Update material if provided
+        material_id = data.get('material')
+        if material_id:
+            try:
+                product.material = Material.objects.get(id=material_id)
+            except Material.DoesNotExist:
+                return Response({'error': 'Material not found'}, status=404)
+        
         # Update supplier if provided
         supplier_id = data.get('supplier')
         if supplier_id:
@@ -240,6 +371,7 @@ def update_product(request, product_id):
                 product.supplier = Supplier.objects.get(id=supplier_id)
             except Supplier.DoesNotExist:
                 return Response({'error': 'Supplier not found'}, status=404)
+        
         # Update invoice if bill_number provided
         bill_number = data.get('bill_number')
         if bill_number:
@@ -248,6 +380,7 @@ def update_product(request, product_id):
                 product.invoice = Invoice.objects.get(bill_number=bill_number)
             except Invoice.DoesNotExist:
                 return Response({'error': 'Invoice not found'}, status=404)
+        
         product.save()
         return Response({'status': 'success', 'message': 'Product updated successfully'})
     except Product.DoesNotExist:
@@ -272,6 +405,7 @@ def create_invoice(request):
         invoice = Invoice.objects.create(bill_number=bill_number)
 
         for item in items:
+            # Create InvoiceItem
             InvoiceItem.objects.create(
                 invoice=invoice,
                 product_name=item['product'],
@@ -280,7 +414,46 @@ def create_invoice(request):
                 size=item['size'],
                 quantity=item['quantity'],
             )
-            # Removed: Product.objects.create(...)
+            
+            # Create Product record with Pending status
+            # Try to find a matching size, or use default
+            size_obj = None
+            if item.get('size'):
+                try:
+                    size_obj = Size.objects.get(name=item['size'])
+                except Size.DoesNotExist:
+                    # If size doesn't exist, create it or use default
+                    size_obj, _ = Size.objects.get_or_create(name=item['size'])
+            
+            # Try to assign a category based on product name
+            category_obj = None
+            product_name_lower = item['product'].lower()
+            if any(keyword in product_name_lower for keyword in ['jeans', 'denim']):
+                category_obj = Category.objects.filter(name__icontains='jeans').first()
+            elif any(keyword in product_name_lower for keyword in ['shirt', 't-shirt', 'tshirt']):
+                category_obj = Category.objects.filter(name__icontains='t-shirt').first()
+            elif any(keyword in product_name_lower for keyword in ['saree', 'sari']):
+                category_obj = Category.objects.filter(name__icontains='saree').first()
+            elif any(keyword in product_name_lower for keyword in ['salwar', 'kameez']):
+                category_obj = Category.objects.filter(name__icontains='salwar').first()
+            elif any(keyword in product_name_lower for keyword in ['skirt']):
+                category_obj = Category.objects.filter(name__icontains='skirt').first()
+            elif any(keyword in product_name_lower for keyword in ['top', 'blouse']):
+                category_obj = Category.objects.filter(name__icontains='top').first()
+            else:
+                # Default to T-shirts if no match found
+                category_obj = Category.objects.filter(name__icontains='t-shirt').first()
+            
+            Product.objects.create(
+                name=item['product'],
+                model_no=item['model_id'],
+                price=item['price'],
+                size=size_obj,
+                category=category_obj,
+                pieces=item['quantity'],
+                invoice=invoice,
+                status='Pending'
+            )
 
         return JsonResponse({'success': True})
 

@@ -12,12 +12,19 @@ const AddProduct = () => {
     pieces: '',
     image: null,
     supplier: '',
+    category: '',
+    color: '',
+    material: '',
   });
   const [products, setProducts] = useState([]);
   const [message, setMessage] = useState('');
   const [pdfLoading, setPdfLoading] = useState(false);
   const [pdfError, setPdfError] = useState('');
   const [suppliers, setSuppliers] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [sizes, setSizes] = useState([]);
+  const [colors, setColors] = useState([]);
+  const [materials, setMaterials] = useState([]);
   const [supplierSearch, setSupplierSearch] = useState('');
   const [showSupplierModal, setShowSupplierModal] = useState(false);
   const [billNumber, setBillNumber] = useState('');
@@ -27,6 +34,10 @@ const AddProduct = () => {
 
   useEffect(() => {
     fetchSuppliers();
+    fetchCategories();
+    fetchSizes();
+    fetchColors();
+    fetchMaterials();
     fetchBillNumbers();
   }, []);
 
@@ -37,6 +48,46 @@ const AddProduct = () => {
       setSuppliers(data);
     } catch (err) {
       setSuppliers([]);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const res = await fetch('http://localhost:8000/api/categories/');
+      const data = await res.json();
+      setCategories(data);
+    } catch (err) {
+      setCategories([]);
+    }
+  };
+
+  const fetchSizes = async () => {
+    try {
+      const res = await fetch('http://localhost:8000/api/sizes/');
+      const data = await res.json();
+      setSizes(data);
+    } catch (err) {
+      setSizes([]);
+    }
+  };
+
+  const fetchColors = async () => {
+    try {
+      const res = await fetch('http://localhost:8000/api/colors/');
+      const data = await res.json();
+      setColors(data);
+    } catch (err) {
+      setColors([]);
+    }
+  };
+
+  const fetchMaterials = async () => {
+    try {
+      const res = await fetch('http://localhost:8000/api/materials/');
+      const data = await res.json();
+      setMaterials(data);
+    } catch (err) {
+      setMaterials([]);
     }
   };
 
@@ -129,6 +180,9 @@ const AddProduct = () => {
       pieces: '',
       image: null,
       supplier: '',
+      category: '',
+      color: '',
+      material: '',
       bill_number: '',
     });
   };
@@ -153,6 +207,9 @@ const AddProduct = () => {
         payload.append(`products[${index}][size]`, product.size);
         payload.append(`products[${index}][pieces]`, product.pieces);
         payload.append(`products[${index}][supplier]`, product.supplier);
+        payload.append(`products[${index}][category]`, product.category || '');
+        payload.append(`products[${index}][color]`, product.color || '');
+        payload.append(`products[${index}][material]`, product.material || '');
         if (product.image) {
           payload.append(`products[${index}][image]`, product.image);
         }
@@ -195,8 +252,31 @@ const AddProduct = () => {
           <input name="name" value={formData.name} onChange={handleChange} placeholder="Product Name" required className="input-field" />
           <input name="model_no" value={formData.model_no} onChange={handleChange} placeholder="Model ID" required className="input-field" />
           <input name="price" value={formData.price} onChange={handleChange} placeholder="Price" required className="input-field" />
-          <input name="size" value={formData.size} onChange={handleChange} placeholder="Size" required className="input-field" />
+          <select name="size" value={formData.size} onChange={handleChange} className="input-field" required>
+            <option value="">Select Size</option>
+            {sizes.map(size => (
+              <option key={size.id} value={size.name}>{size.name}</option>
+            ))}
+          </select>
           <input name="pieces" value={formData.pieces} onChange={handleChange} placeholder="Quantity" required className="input-field" />
+          <select name="category" value={formData.category} onChange={handleChange} className="input-field">
+            <option value="">Select Category</option>
+            {categories.map(category => (
+              <option key={category.id} value={category.name}>{category.name}</option>
+            ))}
+          </select>
+          <select name="color" value={formData.color} onChange={handleChange} className="input-field">
+            <option value="">Select Color</option>
+            {colors.map(color => (
+              <option key={color.id} value={color.name}>{color.name}</option>
+            ))}
+          </select>
+          <select name="material" value={formData.material} onChange={handleChange} className="input-field">
+            <option value="">Select Material</option>
+            {materials.map(material => (
+              <option key={material.id} value={material.name}>{material.name}</option>
+            ))}
+          </select>
           <div className="beautified-supplier-dropdown">
             <input
               type="text"
@@ -310,6 +390,9 @@ const AddProduct = () => {
                 <th>Price</th>
                 <th>Size</th>
                 <th>Quantity</th>
+                <th>Category</th>
+                <th>Color</th>
+                <th>Material</th>
                 <th>Supplier</th>
                 <th>Bill Number</th>
                 <th>Actions</th>
@@ -323,6 +406,9 @@ const AddProduct = () => {
                   <td>{p.price}</td>
                   <td>{p.size}</td>
                   <td>{p.pieces}</td>
+                  <td>{p.category || 'N/A'}</td>
+                  <td>{p.color || 'N/A'}</td>
+                  <td>{p.material || 'N/A'}</td>
                   <td>{suppliers.find(s => s.id === p.supplier)?.name || 'N/A'}</td>
                   <td>{p.bill_number || billNumber || 'N/A'}</td>
                   <td>

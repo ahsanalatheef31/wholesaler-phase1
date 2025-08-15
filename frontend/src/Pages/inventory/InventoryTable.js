@@ -7,29 +7,51 @@ import PopupDialog from '../Auth/PopupDialog';
 const columns = ["Product", "Model ID", "Size", "Stock", "Price", "Supplier", "Bill Number", "Actions", "status"];
 const statusOptions = ["Pending", "Defective", "Returned"];
 
-export default function InventoryTable() {
+export default function InventoryTable({ filters }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState({});
   const [editingProduct, setEditingProduct] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [suppliers, setSuppliers] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [sizes, setSizes] = useState([]);
+  const [colors, setColors] = useState([]);
+  const [materials, setMaterials] = useState([]);
   const [billNumbers, setBillNumbers] = useState([]);
   const [supplierDropdownOpen, setSupplierDropdownOpen] = useState(false);
+  const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
+  const [sizeDropdownOpen, setSizeDropdownOpen] = useState(false);
+  const [colorDropdownOpen, setColorDropdownOpen] = useState(false);
+  const [materialDropdownOpen, setMaterialDropdownOpen] = useState(false);
   const [billDropdownOpen, setBillDropdownOpen] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState({ open: false, productId: null });
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchProducts();
+    fetchProducts(filters);
     fetchSuppliers();
+    fetchCategories();
+    fetchSizes();
+    fetchColors();
+    fetchMaterials();
     fetchBillNumbers();
-  }, []);
+  }, [filters]);
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (filterParams = {}) => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:8000/api/get-products/');
+      const params = new URLSearchParams();
+      if (filterParams.search) params.append('search', filterParams.search);
+      if (filterParams.supplier_id && filterParams.supplier_id !== 'all') params.append('supplier_id', filterParams.supplier_id);
+      if (filterParams.category_id && filterParams.category_id !== 'all') params.append('category_id', filterParams.category_id);
+      if (filterParams.status && filterParams.status !== 'all') params.append('status', filterParams.status);
+      if (filterParams.size_id && filterParams.size_id !== 'all') params.append('size_id', filterParams.size_id);
+      if (filterParams.color_id && filterParams.color_id !== 'all') params.append('color_id', filterParams.color_id);
+      if (filterParams.material_id && filterParams.material_id !== 'all') params.append('material_id', filterParams.material_id);
+      const url = `http://localhost:8000/api/get-products/${params.toString() ? '?' + params.toString() : ''}`;
+      const response = await axios.get(url);
       setProducts(response.data);
       setError(null);
     } catch (err) {
@@ -46,6 +68,42 @@ export default function InventoryTable() {
       setSuppliers(res.data);
     } catch (err) {
       setSuppliers([]);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const res = await axios.get('http://localhost:8000/api/categories/');
+      setCategories(res.data);
+    } catch (err) {
+      setCategories([]);
+    }
+  };
+
+  const fetchSizes = async () => {
+    try {
+      const res = await axios.get('http://localhost:8000/api/sizes/');
+      setSizes(res.data);
+    } catch (err) {
+      setSizes([]);
+    }
+  };
+
+  const fetchColors = async () => {
+    try {
+      const res = await axios.get('http://localhost:8000/api/colors/');
+      setColors(res.data);
+    } catch (err) {
+      setColors([]);
+    }
+  };
+
+  const fetchMaterials = async () => {
+    try {
+      const res = await axios.get('http://localhost:8000/api/materials/');
+      setMaterials(res.data);
+    } catch (err) {
+      setMaterials([]);
     }
   };
 
@@ -66,7 +124,7 @@ export default function InventoryTable() {
     try {
       await axios.delete(`http://localhost:8000/api/delete-product/${deleteDialog.productId}/`);
       setDeleteDialog({ open: false, productId: null });
-      fetchProducts();
+      fetchProducts(filters);
     } catch (err) {
       console.error('Error deleting product:', err);
       alert('Failed to delete product');
@@ -82,7 +140,7 @@ export default function InventoryTable() {
     try {
       await axios.post(`http://localhost:8000/api/update-status/${productId}/`, { status });
       setDropdownOpen((prev) => ({ ...prev, [productId]: false }));
-      fetchProducts();
+      fetchProducts(filters);
     } catch (err) {
       alert('Failed to update status');
     }
@@ -238,7 +296,7 @@ export default function InventoryTable() {
           ) : (
             products.map((item) => (
               <tr key={item.id}>
-                <td>
+                <td onClick={() => setSelectedProduct(item)} style={{ cursor: 'pointer' }}>
                   <div className="product-info">
                     <div className="product-img-placeholder">40×40</div>
                     <div>
@@ -256,7 +314,7 @@ export default function InventoryTable() {
                   {item.bill_number ? (
                     <span
                       style={{ color: 'blue', cursor: 'pointer', textDecoration: 'underline' }}
-                      onClick={() => navigate(`/invoice/${item.bill_number}`)}
+                      onClick={(e) => { e.stopPropagation(); navigate(`/invoice/${item.bill_number}`); }}
                     >
                       {item.bill_number}
                     </span>
@@ -266,13 +324,13 @@ export default function InventoryTable() {
                 </td>
                 <td>
                   <span
-                    onClick={() => setEditingProduct(item)}
+                    onClick={(e) => { e.stopPropagation(); setEditingProduct(item); }}
                     style={{ color: 'blue', textDecoration: 'underline', cursor: 'pointer', marginRight: 10 }}
                   >
                     Edit
                   </span>
                   <span
-                    onClick={() => handleDelete(item.id)}
+                    onClick={(e) => { e.stopPropagation(); handleDelete(item.id); }}
                     style={{ color: 'red', textDecoration: 'underline', cursor: 'pointer' }}
                   >
                     Delete
@@ -283,7 +341,7 @@ export default function InventoryTable() {
                     <button
                       title="Mark as Received"
                       className={`status-icon-btn-standard${item.status === 'Received' ? ' active' : ''}`}
-                      onClick={() => updateStatus(item.id, 'Received')}
+                      onClick={(e) => { e.stopPropagation(); updateStatus(item.id, 'Received'); }}
                     >
                       <img
                         src="/checkmark.png"
@@ -299,7 +357,7 @@ export default function InventoryTable() {
                     <button
                       title="Change Status"
                       className={`status-icon-btn-standard${['Defective', 'Returned'].includes(item.status) ? ' active-x' : ''}`}
-                      onClick={() => handleDropdown(item.id, !dropdownOpen[item.id])}
+                      onClick={(e) => { e.stopPropagation(); handleDropdown(item.id, !dropdownOpen[item.id]); }}
                     >
                       <img
                         src="/cross.png"
@@ -317,8 +375,8 @@ export default function InventoryTable() {
                         className="status-dropdown-standard status-dropdown-inline"
                         autoFocus
                         value={item.status !== 'Received' ? item.status : ''}
-                        onChange={(e) => updateStatus(item.id, e.target.value)}
-                        onBlur={() => handleDropdown(item.id, false)}
+                        onChange={(e) => { e.stopPropagation(); updateStatus(item.id, e.target.value); }}
+                        onBlur={(e) => { e.stopPropagation(); handleDropdown(item.id, false); }}
                       >
                         <option value="" disabled>Choose</option>
                         {statusOptions.map((opt) => (
@@ -346,6 +404,68 @@ export default function InventoryTable() {
           <button className="delete-btn-blue" onClick={confirmDelete}>Yes, Delete</button>
         </div>
       </PopupDialog>
+
+      {/* Product Details Modal */}
+      {selectedProduct && (
+        <div className="modal-overlay" onClick={() => setSelectedProduct(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Product Details</h3>
+              <button className="modal-close" onClick={() => setSelectedProduct(null)}>&times;</button>
+            </div>
+            <div className="modal-body">
+              <div className="product-details-grid">
+                <div className="detail-item">
+                  <label>Product Name:</label>
+                  <span>{selectedProduct.name}</span>
+                </div>
+                <div className="detail-item">
+                  <label>Model ID:</label>
+                  <span>{selectedProduct.model_no}</span>
+                </div>
+                <div className="detail-item">
+                  <label>Category:</label>
+                  <span>{selectedProduct.category_name || 'N/A'}</span>
+                </div>
+                <div className="detail-item">
+                  <label>Size:</label>
+                  <span>{selectedProduct.size_name || 'N/A'}</span>
+                </div>
+                <div className="detail-item">
+                  <label>Color:</label>
+                  <span>{selectedProduct.color_name || 'N/A'}</span>
+                </div>
+                <div className="detail-item">
+                  <label>Material:</label>
+                  <span>{selectedProduct.material_name || 'N/A'}</span>
+                </div>
+                <div className="detail-item">
+                  <label>Stock:</label>
+                  <span>{selectedProduct.pieces}</span>
+                </div>
+                <div className="detail-item">
+                  <label>Price:</label>
+                  <span>₹{parseFloat(selectedProduct.price).toFixed(2)}</span>
+                </div>
+                <div className="detail-item">
+                  <label>Supplier:</label>
+                  <span>{selectedProduct.supplier_name || 'N/A'}</span>
+                </div>
+                <div className="detail-item">
+                  <label>Bill Number:</label>
+                  <span>{selectedProduct.bill_number || 'N/A'}</span>
+                </div>
+                <div className="detail-item">
+                  <label>Status:</label>
+                  <span className={`status-badge status-${selectedProduct.status.toLowerCase()}`}>
+                    {selectedProduct.status}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

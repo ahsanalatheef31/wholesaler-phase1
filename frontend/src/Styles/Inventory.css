@@ -39,16 +39,36 @@ body {
 
 .inventory-filters {
   display: flex;
-  gap: 10px;
   margin-bottom: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
 }
 
-.inventory-filters input,
-.inventory-filters select {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+.filter-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.filter-row input,
+.filter-row select {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.filter-row input {
   flex: 1;
+  min-width: 200px;
+}
+
+.filter-row select {
+  min-width: 120px;
+  flex-shrink: 0;
 }
 
 .inventory-table {
@@ -392,4 +412,114 @@ textarea {
 }
 .delete-btn-blue:hover {
   background-color: #142b61;
+}
+
+/* Product Details Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+}
+
+.modal-close:hover {
+  color: #333;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.product-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.detail-item label {
+  font-weight: 600;
+  color: #666;
+  font-size: 14px;
+}
+
+.detail-item span {
+  color: #333;
+  font-size: 16px;
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.status-pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-received {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-defective {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status-returned {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.status-sold {
+  background: #e2e3e5;
+  color: #383d41;
 }
