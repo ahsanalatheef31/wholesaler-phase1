@@ -7,7 +7,7 @@ import {
 } from 'react-router-dom';
 import Navbar from './Components/Navbar';
 import Profile from './Pages/Profile';
-import Dashboard from './Pages/Dashboard';
+import Dashboard from './Pages/Dashboard/Dashboard';
 import Inventory from './Pages/inventory/Inventory';
 import Orders from './Pages/Orders';
 import Supplier from './Pages/Supplier/Supplier';

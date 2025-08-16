@@ -14,22 +14,52 @@ class ProductSerializer(serializers.ModelSerializer):
     material_name = serializers.SerializerMethodField(read_only=True)
 
     def get_supplier_name(self, obj):
-        return obj.supplier.name if obj.supplier else None
+        try:
+            if hasattr(obj, 'supplier') and obj.supplier:
+                return obj.supplier.name
+            return None
+        except:
+            return None
 
     def get_bill_number(self, obj):
-        return obj.invoice.bill_number if hasattr(obj, 'invoice') and obj.invoice else None
+        try:
+            if hasattr(obj, 'invoice') and obj.invoice:
+                return obj.invoice.bill_number
+            return None
+        except:
+            return None
 
     def get_category_name(self, obj):
-        return obj.category.name if obj.category else None
+        try:
+            if hasattr(obj, 'category') and obj.category:
+                return obj.category.name
+            return None
+        except:
+            return None
 
     def get_size_name(self, obj):
-        return obj.size.name if obj.size else None
+        try:
+            if hasattr(obj, 'size') and obj.size:
+                return obj.size.name
+            return None
+        except:
+            return None
 
     def get_color_name(self, obj):
-        return obj.color.name if obj.color else None
+        try:
+            if hasattr(obj, 'color') and obj.color:
+                return obj.color.name
+            return None
+        except:
+            return None
 
     def get_material_name(self, obj):
-        return obj.material.name if obj.material else None
+        try:
+            if hasattr(obj, 'material') and obj.material:
+                return obj.material.name
+            return None
+        except:
+            return None
 
     def create(self, validated_data):
         # Handles both single and bulk creation

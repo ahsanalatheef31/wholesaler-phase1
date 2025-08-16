@@ -28,5 +28,9 @@ urlpatterns = [
     path('sizes/', views.get_sizes, name='get_sizes'),
     path('colors/', views.get_colors, name='get_colors'),
     path('materials/', views.get_materials, name='get_materials'),
+    path('dashboard-stats/', views.dashboard_stats, name='dashboard_stats'),
+    path('pending-products/', views.pending_products, name='pending_products'),
+    path('supplier-pie-chart/', views.supplier_pie_chart_data, name='supplier_pie_chart_data'),
+    path('category-stats/', views.category_stats, name='category_stats'),
     path('', include(router.urls)),
 ]

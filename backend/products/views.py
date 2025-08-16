@@ -15,52 +15,72 @@ from django.db.models import Q
 
 @api_view(['GET'])
 def get_products(request):
-    products = Product.objects.all()
-    
-    # supplier filter
-    supplier_id = request.GET.get('supplier_id')
-    if supplier_id and supplier_id != 'all':
-        products = products.filter(supplier_id=supplier_id)
+    try:
+        # Get products with valid foreign key references only
+        products = Product.objects.select_related('supplier', 'category', 'size', 'color', 'material', 'invoice').all()
+        
+        # Filter out products with orphaned references by checking if related objects exist
+        valid_products = []
+        for product in products:
+            try:
+                # Test if all related objects are accessible
+                _ = product.supplier.name if product.supplier else None
+                _ = product.category.name if product.category else None
+                _ = product.size.name if product.size else None
+                _ = product.color.name if product.color else None
+                _ = product.material.name if product.material else None
+                _ = product.invoice.bill_number if product.invoice else None
+                valid_products.append(product)
+            except:
+                # Skip products with orphaned references
+                continue
+        
+        # supplier filter
+        supplier_id = request.GET.get('supplier_id')
+        if supplier_id and supplier_id != 'all':
+            valid_products = [p for p in valid_products if p.supplier and p.supplier.id == int(supplier_id)]
 
-    # category filter
-    category_id = request.GET.get('category_id')
-    if category_id and category_id != 'all':
-        products = products.filter(category_id=category_id)
+        # category filter
+        category_id = request.GET.get('category_id')
+        if category_id and category_id != 'all':
+            valid_products = [p for p in valid_products if p.category and p.category.id == int(category_id)]
 
-    # status filter
-    status = request.GET.get('status')
-    if status and status != 'all':
-        products = products.filter(status=status)
+        # status filter
+        status = request.GET.get('status')
+        if status and status != 'all':
+            valid_products = [p for p in valid_products if p.status == status]
 
-    # size filter
-    size_id = request.GET.get('size_id')
-    if size_id and size_id != 'all':
-        products = products.filter(size_id=size_id)
+        # size filter
+        size_id = request.GET.get('size_id')
+        if size_id and size_id != 'all':
+            valid_products = [p for p in valid_products if p.size and p.size.id == int(size_id)]
 
-    # color filter
-    color_id = request.GET.get('color_id')
-    if color_id and color_id != 'all':
-        products = products.filter(color_id=color_id)
+        # color filter
+        color_id = request.GET.get('color_id')
+        if color_id and color_id != 'all':
+            valid_products = [p for p in valid_products if p.color and p.color.id == int(color_id)]
 
-    # material filter
-    material_id = request.GET.get('material_id')
-    if material_id and material_id != 'all':
-        products = products.filter(material_id=material_id)
+        # material filter
+        material_id = request.GET.get('material_id')
+        if material_id and material_id != 'all':
+            valid_products = [p for p in valid_products if p.material and p.material.id == int(material_id)]
 
-    # search query (searches name, model_no, and related fields)
-    search_query = request.GET.get('search')
-    if search_query:
-        products = products.filter(
-            Q(name__icontains=search_query) | 
-            Q(model_no__icontains=search_query) |
-            Q(category__name__icontains=search_query) |
-            Q(size__name__icontains=search_query) |
-            Q(color__name__icontains=search_query) |
-            Q(material__name__icontains=search_query)
-        )
+        # search query (searches name, model_no, and related fields)
+        search_query = request.GET.get('search')
+        if search_query:
+            valid_products = [p for p in valid_products if (
+                search_query.lower() in p.name.lower() or
+                search_query.lower() in p.model_no.lower() or
+                (p.category and search_query.lower() in p.category.name.lower()) or
+                (p.size and search_query.lower() in p.size.name.lower()) or
+                (p.color and search_query.lower() in p.color.name.lower()) or
+                (p.material and search_query.lower() in p.material.name.lower())
+            )]
 
-    serializer = ProductSerializer(products, many=True)
-    return Response(serializer.data)
+        serializer = ProductSerializer(valid_products, many=True)
+        return Response(serializer.data)
+    except Exception as e:
+        return Response({'error': f'Error retrieving products: {str(e)}'}, status=500)
 
 @api_view(['GET'])
 def get_categories(request):
@@ -502,3 +522,138 @@ def list_invoices(request):
             for invoice in invoices
         ]
         return JsonResponse(data, safe=False)
+
+@api_view(['GET'])
+def dashboard_stats(request):
+    try:
+        from .models import Invoice, Product
+        
+        # Get total invoices
+        total_invoices = Invoice.objects.count()
+        
+        # Get product counts by status
+        total_pending = Product.objects.filter(status='Pending').count()
+        total_received = Product.objects.filter(status='Received').count()
+        total_returned = Product.objects.filter(status='Returned').count()
+        
+        stats = {
+            'total_invoices': total_invoices,
+            'total_pending': total_pending,
+            'total_received': total_received,
+            'total_returned': total_returned
+        }
+        
+        return Response(stats)
+    except Exception as e:
+        return Response({'error': f'Error retrieving dashboard stats: {str(e)}'}, status=500)
+
+@api_view(['GET'])
+def pending_products(request):
+    try:
+        from .models import Product
+        
+        # Get pending products with supplier information
+        pending_products = Product.objects.filter(status='Pending').select_related('supplier')[:10]  # Limit to 10
+        
+        products_data = []
+        for product in pending_products:
+            products_data.append({
+                'id': product.id,
+                'name': product.name,
+                'value': f"₹{product.price}",
+                'supplier': product.supplier.name if product.supplier else 'No Supplier'
+            })
+        
+        return Response(products_data)
+    except Exception as e:
+        return Response({'error': f'Error retrieving pending products: {str(e)}'}, status=500)
+
+@api_view(['GET'])
+def supplier_pie_chart_data(request):
+    try:
+        from .models import Product, Supplier
+        from django.db.models import Count
+        
+        # Get suppliers with their product counts, ordered by product count (descending)
+        supplier_stats = Product.objects.values('supplier__name').annotate(
+            product_count=Count('id')
+        ).filter(
+            supplier__isnull=False
+        ).order_by('-product_count')
+        
+        # Get top 3 suppliers
+        top_suppliers = list(supplier_stats[:3])
+        
+        # Calculate total products from other suppliers
+        other_suppliers_count = 0
+        if len(supplier_stats) > 3:
+            other_suppliers_count = sum(stat['product_count'] for stat in supplier_stats[3:])
+        
+        # Format data for pie chart
+        pie_chart_data = []
+        
+        # Add top 3 suppliers
+        for stat in top_suppliers:
+            pie_chart_data.append({
+                'name': stat['supplier__name'],
+                'value': stat['product_count']
+            })
+        
+        # Add "Others" category if there are more suppliers
+        if other_suppliers_count > 0:
+            pie_chart_data.append({
+                'name': 'Others',
+                'value': other_suppliers_count
+            })
+        
+        return Response(pie_chart_data)
+    except Exception as e:
+        return Response({'error': f'Error retrieving supplier pie chart data: {str(e)}'}, status=500)
+
+@api_view(['GET'])
+def category_stats(request):
+    try:
+        from .models import Product, Category
+        from django.db.models import Count
+        
+        # Get total products
+        total_products = Product.objects.count()
+        
+        if total_products == 0:
+            return Response([])
+        
+        # Get categories with their product counts
+        category_stats = Product.objects.values('category__name').annotate(
+            product_count=Count('id')
+        ).filter(
+            category__isnull=False
+        ).order_by('-product_count')
+        
+        # Count products without categories
+        uncategorized_count = Product.objects.filter(category__isnull=True).count()
+        
+        # Format data for progress bars (calculate percentages)
+        category_data = []
+        
+        # Add categorized products
+        for stat in category_stats:
+            if stat['category__name']:
+                percentage = round((stat['product_count'] / total_products) * 100)
+                category_data.append({
+                    'name': stat['category__name'],
+                    'value': percentage,
+                    'count': stat['product_count']
+                })
+        
+        # Add uncategorized products if any exist
+        if uncategorized_count > 0:
+            percentage = round((uncategorized_count / total_products) * 100)
+            category_data.append({
+                'name': 'Uncategorized',
+                'value': percentage,
+                'count': uncategorized_count
+            })
+        
+        return Response(category_data)
+    except Exception as e:
+        return Response({'error': f'Error retrieving category stats: {str(e)}'}, status=500)
