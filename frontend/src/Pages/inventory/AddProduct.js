@@ -319,10 +319,10 @@ const AddProduct = () => {
               placeholder="Bill Number"
               autoComplete="off"
               className="input-field"
-              style={{ width: 200 }}
+              style={{ width: '100%' }}
             />
             {showBillDropdown && billNumberList.length > 0 && (
-              <div className="dropdown-list beautified-dropdown-list" style={{ position: 'absolute', zIndex: 30, background: '#fff', border: '1px solid #ccc', width: 200, maxHeight: 150, overflowY: 'auto' }}>
+              <div className="dropdown-list beautified-dropdown-list" style={{ position: 'absolute', zIndex: 30, background: '#fff', border: '1px solid #ccc', width: '100%', maxHeight: 150, overflowY: 'auto' }}>
                 {billNumberList
                   .filter(bn => bn.toLowerCase().includes(billNumber.toLowerCase()))
                   .map(bn => (

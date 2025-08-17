@@ -179,100 +179,164 @@ export default function InventoryTable({ filters }) {
           style={{ marginBottom: 20, padding: 16, border: '1px solid #ccc', borderRadius: 8, background: '#f9f9f9' }}
         >
           <h3>Edit Product</h3>
-          <input
-            value={editingProduct.name}
-            onChange={e => setEditingProduct({ ...editingProduct, name: e.target.value })}
-            placeholder="Product Name"
-            required
-            style={{ marginRight: 8, marginBottom: 8, width: '100%' }}
-          />
-          <input
-            value={editingProduct.model_no}
-            onChange={e => setEditingProduct({ ...editingProduct, model_no: e.target.value })}
-            placeholder="Model ID"
-            required
-            style={{ marginRight: 8, marginBottom: 8, width: '100%' }}
-          />
-          <input
-            value={editingProduct.size}
-            onChange={e => setEditingProduct({ ...editingProduct, size: e.target.value })}
-            placeholder="Size"
-            required
-            style={{ marginRight: 8, marginBottom: 8, width: '100%' }}
-          />
-          <input
-            value={editingProduct.pieces}
-            onChange={e => setEditingProduct({ ...editingProduct, pieces: e.target.value })}
-            placeholder="Stock"
-            required
-            style={{ marginRight: 8, marginBottom: 8, width: '100%' }}
-          />
-          <input
-            value={editingProduct.price}
-            onChange={e => setEditingProduct({ ...editingProduct, price: e.target.value })}
-            placeholder="Price"
-            required
-            style={{ marginRight: 8, marginBottom: 8, width: '100%' }}
-          />
-          {/* Supplier custom dropdown */}
-          <div style={{ position: 'relative', marginBottom: 8 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: 12 }}>
             <input
-              value={suppliers.find(s => s.id === editingProduct.supplier)?.name || ''}
-              onFocus={() => setSupplierDropdownOpen(true)}
-              onBlur={() => setTimeout(() => setSupplierDropdownOpen(false), 150)}
-              onChange={e => {
-                setEditingProduct({ ...editingProduct, supplier: '' });
-              }}
-              placeholder="Select Supplier"
-              style={{ width: '100%', padding: '8px', borderRadius: 4, border: '1px solid #ccc' }}
-              readOnly
+              value={editingProduct.name}
+              onChange={e => setEditingProduct({ ...editingProduct, name: e.target.value })}
+              placeholder="Product Name"
+              required
+              style={{ padding: '8px', borderRadius: 4, border: '1px solid #ccc', width: '100%', boxSizing: 'border-box' }}
             />
-            {supplierDropdownOpen && (
-              <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #ccc', zIndex: 10, maxHeight: 180, overflowY: 'auto', borderRadius: 4 }}>
-                {suppliers.map(s => (
-                  <div
-                    key={s.id}
-                    style={{ padding: 8, cursor: 'pointer', color: '#222' }}
-                    onMouseDown={() => {
-                      setEditingProduct({ ...editingProduct, supplier: s.id });
-                      setSupplierDropdownOpen(false);
-                    }}
-                  >
-                    {s.name}
-                  </div>
-                ))}
-              </div>
-            )}
+            <input
+              value={editingProduct.model_no}
+              onChange={e => setEditingProduct({ ...editingProduct, model_no: e.target.value })}
+              placeholder="Model ID"
+              required
+              style={{ padding: '8px', borderRadius: 4, border: '1px solid #ccc', width: '100%', boxSizing: 'border-box' }}
+            />
           </div>
-          {/* Bill number custom dropdown */}
-          <div style={{ position: 'relative', marginBottom: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: 12 }}>
+            <select 
+              value={editingProduct.size} 
+              onChange={e => setEditingProduct({ ...editingProduct, size: e.target.value })}
+              style={{ padding: '8px', borderRadius: 4, border: '1px solid #ccc', width: '100%', boxSizing: 'border-box' }}
+              required
+            >
+              <option value="">Select Size</option>
+              {sizes.map(size => (
+                <option key={size.id} value={size.name}>{size.name}</option>
+              ))}
+            </select>
             <input
-              value={editingProduct.bill_number || ''}
-              onFocus={() => setBillDropdownOpen(true)}
-              onBlur={() => setTimeout(() => setBillDropdownOpen(false), 150)}
-              onChange={e => {
-                setEditingProduct({ ...editingProduct, bill_number: e.target.value });
-              }}
-              placeholder="Select Bill Number"
-              style={{ width: '100%', padding: '8px', borderRadius: 4, border: '1px solid #ccc' }}
-              readOnly
+              value={editingProduct.pieces}
+              onChange={e => setEditingProduct({ ...editingProduct, pieces: e.target.value })}
+              placeholder="Stock"
+              required
+              style={{ padding: '8px', borderRadius: 4, border: '1px solid #ccc', width: '100%', boxSizing: 'border-box' }}
             />
-            {billDropdownOpen && (
-              <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #ccc', zIndex: 10, maxHeight: 180, overflowY: 'auto', borderRadius: 4 }}>
-                {billNumbers.map(bn => (
-                  <div
-                    key={bn}
-                    style={{ padding: 8, cursor: 'pointer', color: '#222' }}
-                    onMouseDown={() => {
-                      setEditingProduct({ ...editingProduct, bill_number: bn });
-                      setBillDropdownOpen(false);
-                    }}
-                  >
-                    {bn}
-                  </div>
-                ))}
-              </div>
-            )}
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '12px', marginBottom: 12 }}>
+            <input
+              value={editingProduct.price}
+              onChange={e => setEditingProduct({ ...editingProduct, price: e.target.value })}
+              placeholder="Price"
+              required
+              style={{ padding: '8px', borderRadius: 4, border: '1px solid #ccc', width: '100%', boxSizing: 'border-box' }}
+            />
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: 12 }}>
+            {/* Supplier custom dropdown */}
+            <div style={{ position: 'relative' }}>
+              <input
+                value={suppliers.find(s => s.id === editingProduct.supplier)?.name || ''}
+                onFocus={() => setSupplierDropdownOpen(true)}
+                onBlur={() => setTimeout(() => setSupplierDropdownOpen(false), 150)}
+                onChange={e => {
+                  setEditingProduct({ ...editingProduct, supplier: '' });
+                }}
+                placeholder="Select Supplier"
+                style={{ padding: '8px', borderRadius: 4, border: '1px solid #ccc', width: '100%', boxSizing: 'border-box' }}
+                readOnly
+              />
+              {supplierDropdownOpen && (
+                <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #ccc', zIndex: 10, maxHeight: 180, overflowY: 'auto', borderRadius: 4 }}>
+                  {suppliers.map(s => (
+                    <div
+                      key={s.id}
+                      style={{ padding: 8, cursor: 'pointer', color: '#222' }}
+                      onMouseDown={() => {
+                        setEditingProduct({ ...editingProduct, supplier: s.id });
+                        setSupplierDropdownOpen(false);
+                      }}
+                    >
+                      {s.name}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            {/* Category dropdown */}
+            <select 
+              value={editingProduct.category || ''} 
+              onChange={e => setEditingProduct({ ...editingProduct, category: e.target.value })}
+              style={{ padding: '8px', borderRadius: 4, border: '1px solid #ccc', width: '100%', boxSizing: 'border-box' }}
+            >
+              <option value="">Select Category</option>
+              {categories.map(category => (
+                <option key={category.id} value={category.name}>{category.name}</option>
+              ))}
+            </select>
+          </div>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: 12 }}>
+            {/* Color dropdown */}
+            <select 
+              value={editingProduct.color || ''} 
+              onChange={e => setEditingProduct({ ...editingProduct, color: e.target.value })}
+              style={{ padding: '8px', borderRadius: 4, border: '1px solid #ccc', width: '100%', boxSizing: 'border-box' }}
+            >
+              <option value="">Select Color</option>
+              {colors.map(color => (
+                <option key={color.id} value={color.name}>{color.name}</option>
+              ))}
+            </select>
+            
+            {/* Material dropdown */}
+            <select 
+              value={editingProduct.material || ''} 
+              onChange={e => setEditingProduct({ ...editingProduct, material: e.target.value })}
+              style={{ padding: '8px', borderRadius: 4, border: '1px solid #ccc', width: '100%', boxSizing: 'border-box' }}
+            >
+              <option value="">Select Material</option>
+              {materials.map(material => (
+                <option key={material.id} value={material.name}>{material.name}</option>
+              ))}
+            </select>
+          </div>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: 12 }}>
+            {/* Bill number custom dropdown */}
+            <div style={{ position: 'relative' }}>
+              <input
+                value={editingProduct.bill_number || ''}
+                onFocus={() => setBillDropdownOpen(true)}
+                onBlur={() => setTimeout(() => setBillDropdownOpen(false), 150)}
+                onChange={e => {
+                  setEditingProduct({ ...editingProduct, bill_number: e.target.value });
+                }}
+                placeholder="Select Bill Number"
+                style={{ padding: '8px', borderRadius: 4, border: '1px solid #ccc', width: '100%', boxSizing: 'border-box' }}
+                readOnly
+              />
+              {billDropdownOpen && (
+                <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #ccc', zIndex: 10, maxHeight: 180, overflowY: 'auto', borderRadius: 4 }}>
+                  {billNumbers.map(bn => (
+                    <div
+                      key={bn}
+                      style={{ padding: 8, cursor: 'pointer', color: '#222' }}
+                      onMouseDown={() => {
+                        setEditingProduct({ ...editingProduct, bill_number: bn });
+                        setBillDropdownOpen(false);
+                      }}
+                    >
+                      {bn}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            {/* Image upload */}
+            <label style={{ padding: '8px', background: '#f0f0f0', borderRadius: 4, cursor: 'pointer', textAlign: 'center', border: '1px solid #ccc', boxSizing: 'border-box', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              Update Product Image
+              <input
+                type="file"
+                accept="image/*"
+                onChange={e => setEditingProduct({ ...editingProduct, image: e.target.files[0] })}
+                style={{ display: 'none' }}
+              />
+            </label>
           </div>
           <button type="submit" style={{ marginRight: 8, background: '#2451a4', color: '#fff', border: 'none', borderRadius: 5, padding: '8px 20px', fontWeight: 500, fontSize: 16 }}>Update</button>
           <button type="button" onClick={() => setEditingProduct(null)} style={{ padding: '8px 20px', borderRadius: 5, border: '1px solid #ccc', background: '#fff', fontWeight: 500, fontSize: 16 }}>Cancel</button>
